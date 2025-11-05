@@ -1,0 +1,55 @@
+<div class="login-container">
+  <div class="login-box">
+    <div class="login-header">
+      <h2>Iniciar sesión</h2>
+    </div>
+    
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="form-group">
+        <label for="email">Correo electrónico</label>
+        <input 
+          id="email" 
+          type="email" 
+          formControlName="email"
+          class="form-control"
+          [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+          required>
+        <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
+          Por favor ingresa un correo electrónico válido
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input 
+          id="password" 
+          type="password" 
+          formControlName="password"
+          class="form-control"
+          [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+          required>
+        <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-message">
+          La contraseña es requerida
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="login-button"
+          [disabled]="loginForm.invalid || loading">
+          <span *ngIf="!loading">Iniciar sesión</span>
+          <span *ngIf="loading">Iniciando sesión...</span>
+        </button>
+      </div>
+
+      <div *ngIf="error" class="error-message server-error">
+        {{ error }}
+      </div>
+
+      <div class="forgot-password">
+        <a routerLink="/forgot-password" class="forgot-link">¿Olvidaste tu contraseña?</a>
+      </div>
+    </form>
+  </div>
+</div>
