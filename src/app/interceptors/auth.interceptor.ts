@@ -20,10 +20,10 @@ export function authInterceptor(request: HttpRequest<unknown>, next: HttpHandler
 
   return next(request).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401) {
-        authService.logout();
-        router.navigate(['/login']);
-      }
+    if (error.status === 401) {
+  authService.logout();
+  router.navigate(['/auth/login']);
+}
       return throwError(() => error);
     })
   );

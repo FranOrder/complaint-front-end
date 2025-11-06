@@ -1,0 +1,223 @@
+<div class="container py-4">
+  <div class="row">
+    <!-- User Profile Card -->
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Mi Perfil</h4>
+        </div>
+        <div class="card-body">
+          <div class="text-center mb-4">
+            <div class="profile-avatar bg-primary bg-opacity-10 text-primary">
+              <i class="bi bi-person-fill fs-1"></i>
+            </div>
+            <h4 class="mt-3 mb-1 fw-bold">{{ user?.fullName || 'Usuario' }}</h4>
+            <p class="text-muted mb-0">{{ user?.email || 'usuario@ejemplo.com' }}</p>
+            <p class="small text-muted">{{ user?.role || 'Usuario' }}</p>
+          </div>
+          
+          <div class="user-details">
+            <div class="mb-3">
+              <p class="mb-1 small text-muted">Nombre completo</p>
+              <p class="mb-3">{{ user?.fullName || 'No especificado' }}</p>
+            </div>
+
+            <div class="mb-3">
+              <p class="mb-1 small text-muted">Correo electrónico</p>
+              <p class="mb-3">{{ user?.email || 'No especificado' }}</p>
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <p class="small text-muted mb-0">Teléfono</p>
+                <button *ngIf="!isEditingPhone" 
+                        type="button" 
+                        class="btn btn-sm btn-link p-0 text-decoration-none" 
+                        (click)="toggleEditPhone()">
+                  <i class="bi bi-pencil-square small me-1"></i>
+                  <span class="small">Cambiar</span>
+                </button>
+              </div>
+              
+              <div *ngIf="!isEditingPhone">
+                <p class="mb-0">{{ user?.phone || 'No especificado' }}</p>
+              </div>
+              
+              <div *ngIf="isEditingPhone" class="mt-2">
+                <form [formGroup]="phoneForm" (ngSubmit)="onUpdatePhone()" class="d-flex gap-2">
+                  <input type="tel" 
+                         class="form-control form-control-sm" 
+                         formControlName="phone" 
+                         placeholder="Ingrese su teléfono"
+                         [class.is-invalid]="phoneForm.get('phone')?.invalid && (phoneForm.get('phone')?.dirty || phoneForm.get('phone')?.touched)">
+                  <button type="submit" 
+                          class="btn btn-sm btn-primary" 
+                          [disabled]="phoneForm.invalid || phoneForm.pristine">
+                    <i class="bi bi-check-lg"></i>
+                  </button>
+                  <button type="button" 
+                          class="btn btn-sm btn-outline-secondary" 
+                          (click)="toggleEditPhone()">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                  <div *ngIf="phoneForm.get('phone')?.invalid && (phoneForm.get('phone')?.dirty || phoneForm.get('phone')?.touched)" class="invalid-feedback d-block">
+                    <small *ngIf="phoneForm.get('phone')?.hasError('required')">El teléfono es requerido</small>
+                    <small *ngIf="phoneForm.get('phone')?.hasError('pattern')">Ingrese un número de teléfono válido (9-15 dígitos)</small>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-8">
+      <!-- Alerts -->
+      <div *ngIf="error" class="alert alert-danger mb-4">{{ error }}</div>
+      <div *ngIf="success" class="alert alert-success mb-4">{{ success }}</div>
+
+      <!-- Complaints List -->
+      <div class="card shadow-sm">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">Mis Denuncias</h5>
+          <a routerLink="/victim/complaint" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-plus-lg me-1"></i> Nueva denuncia
+          </a>
+        </div>
+        <div class="card-body p-0">
+          <div *ngIf="complaints.length === 0" class="text-center p-4 text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            <p class="mb-0">No hay denuncias registradas</p>
+          </div>
+          
+          <div *ngIf="loading" class="text-center p-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-2">Cargando denuncias...</p>
+          </div>
+
+          <div *ngIf="!loading && complaints.length === 0" class="text-center p-4 text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            <p class="mb-0">No hay denuncias registradas</p>
+          </div>
+
+          <div *ngIf="!loading && complaints.length > 0" class="row g-3">
+            <div *ngFor="let complaint of complaints" class="col-12">
+              <div class="card shadow-sm">
+                <div class="card-header py-2" 
+                     [ngClass]="{
+                       'bg-success bg-opacity-10 border-start border-5 border-success': complaint.status === 'ACTION_TAKEN',
+                       'bg-danger bg-opacity-10 border-start border-5 border-danger': complaint.status === 'CLOSED',
+                       'bg-warning bg-opacity-10 border-start border-5 border-warning': complaint.status === 'IN_REVIEW',
+                       'bg-info bg-opacity-10 border-start border-5 border-info': complaint.status === 'RECEIVED'
+                     }">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold">
+                      {{ getViolenceTypeLabel(complaint.violenceType) }}
+                    </h6>
+                    <span class="badge" 
+                          [ngClass]="{
+                            'bg-warning': complaint.status === 'PENDING',
+                            'bg-info': complaint.status === 'UNDER_REVIEW',
+                            'bg-primary': complaint.status === 'ACTION_TAKEN',
+                            'bg-success': complaint.status === 'CLOSED',
+                            'bg-danger': complaint.status === 'REJECTED'
+                          }">
+                      {{ getStatusLabel(complaint.status) }}
+                    </span>
+                  </div>
+                </div>
+                <div class="card-body py-2">
+                  <div class="row align-items-center">
+                    <div class="col-md-8">
+                      <p class="mb-1 small text-truncate">
+                        {{ complaint.description || 'Sin descripción' }}
+                      </p>
+                      <div class="d-flex flex-wrap gap-3">
+                        <span class="text-muted small">
+                          <i class="bi bi-calendar-event me-1"></i>
+                          {{ complaint.incidentDate | date:'dd/MM/yyyy' }}
+                        </span>
+                        <span class="text-muted small">
+                          <i class="bi bi-calendar-check me-1"></i>
+                          {{ complaint.createdAt | date:'dd/MM/yyyy' }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="col-md-4 text-md-end mt-2 mt-md-0">
+                      <button (click)="toggleComplaintDetails(complaint)" 
+                              class="btn btn-sm btn-outline-primary d-flex align-items-center">
+                        <span class="me-1">
+                          {{ complaint.isExpanded ? 'Ocultar' : 'Ver' }} detalles
+                        </span>
+                        <i class="bi" 
+                           [class.bi-chevron-down]="!complaint.isExpanded" 
+                           [class.bi-chevron-up]="complaint.isExpanded">
+                        </i>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Detalles expandibles -->
+                  <div *ngIf="complaint.isExpanded" class="mt-3 pt-3 border-top">
+                    <h6 class="fw-bold mb-3">Detalles de la denuncia</h6>
+                    
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="mb-3">
+                          <p class="mb-1 small text-muted">Descripción completa</p>
+                          <p class="mb-0">{{ complaint.description || 'Sin descripción' }}</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                          <p class="mb-1 small text-muted">Ubicación del incidente</p>
+                          <p class="mb-0">{{ complaint.incidentLocation || 'No especificada' }}</p>
+                        </div>
+                      </div>
+                      
+                      <div class="col-md-6">
+                        <div *ngIf="complaint.aggressor || complaint.aggressorFullName" class="card bg-light">
+                          <div class="card-body p-3">
+                            <h6 class="card-subtitle mb-2 text-muted">Agresor</h6>
+                            <p class="card-text mb-1">
+                              <strong>Nombre:</strong> {{ complaint.aggressor?.fullName || complaint.aggressorFullName || 'No especificado' }}
+                            </p>
+                            <p class="card-text mb-1">
+                              <strong>Relación:</strong> {{ complaint.aggressor?.relationship || complaint.aggressorRelationship || 'No especificada' }}
+                            </p>
+                            <div *ngIf="complaint.aggressor?.additionalDetails || complaint.aggressorAdditionalDetails">
+                              <p class="card-text mb-0">
+                                <strong>Detalles adicionales:</strong> {{ complaint.aggressor?.additionalDetails || complaint.aggressorAdditionalDetails }}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div *ngIf="complaint.evidences && complaint.evidences.length > 0" class="mt-3">
+                      <h6>Evidencias adjuntas:</h6>
+                      <div class="d-flex flex-wrap gap-2">
+                        <a *ngFor="let evidence of complaint.evidences" 
+                           [href]="evidence?.url" 
+                           target="_blank" 
+                           class="btn btn-sm btn-outline-secondary"
+                           *ngIf="evidence?.url">
+                          <i class="bi bi-paperclip me-1"></i>
+                          {{ evidence?.type || 'Evidencia' }} {{ evidence?.id ? '#' + evidence.id : '' }}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

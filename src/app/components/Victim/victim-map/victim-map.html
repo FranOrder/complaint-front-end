@@ -1,0 +1,167 @@
+<main class="ms-sm-auto px-md-4 py-4">
+  <div class="row">
+            <div class="col-12">
+            <div class="welcome-header p-4 d-flex flex-column flex-md-row justify-content-between align-items-center lh-lg">
+                <div>
+                    <h2 class="fw-bold">Puntos de ayuda cercanos</h2>
+                    <p class="mb-0" style="font-size: 18px;">
+                        Encuentra centros de apoyo cerca de ti, como comisarias, refugios y centros de salud. Tu ubicación no se comparte con nadie.
+                    </p>
+                    <small class="d-block mt-2 fst-italic text-danger">
+                        <i class="bi bi-map"></i>
+                        Selecciona un punto para ver detalles y cómo llegar..
+                    </small>
+                </div>
+            </div>
+        </div>
+        <!-- Map and Details Section -->
+    <div class="col-lg-9">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            {{ selectedCenter ? selectedCenter.name : 'Seleccione un centro' }}
+          </h5>
+          <!--<div *ngIf="selectedCenter">
+            <span class="badge" [ngClass]="selectedCenter.is_active ? 'bg-success' : 'bg-danger'">
+              {{ selectedCenter.is_active ? 'Abierto' : 'Cerrado' }}
+            </span>
+          </div> -->
+        </div>
+        
+        <div class="card-body p-0">
+          <!-- Map -->
+          <div *ngIf="selectedCenter" class="h-50">
+            <!-- Mapa embebido -->
+            <iframe *ngIf="mapUrl" 
+                   [src]="mapUrl"
+                   width="100%" 
+                   height="100%" 
+                   style="border:0;" 
+                   allowfullscreen="" 
+                   loading="lazy"
+                   referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+            
+            <!-- Mensaje cuando no hay mapa disponible -->
+            <div *ngIf="!mapUrl" class="h-100 d-flex flex-column align-items-center justify-content-center bg-light p-3">
+              <i class="bi bi-map fs-1 text-warning"></i>
+              <h5 class="mt-2 text-center">Ubicación no disponible</h5>
+              <p class="text-center text-muted">
+                No se pudo cargar la ubicación en el mapa.
+              </p>
+              <div class="text-center mt-2">
+                <a *ngIf="selectedCenter.street" 
+                   [href]="getGoogleMapsLink(selectedCenter)" 
+                   target="_blank" 
+                   class="btn btn-primary btn-sm">
+                  <i class="bi bi-geo-alt"></i> Ver en Google Maps
+                </a>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Detalles del Centro -->
+          <div *ngIf="selectedCenter" class="p-4 h-50 overflow-auto">
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Información de Contacto</h6>
+                <p class="mb-1">
+                  <i class="bi bi-geo-alt-fill text-primary me-2"></i>
+                  {{ selectedCenter.street }}
+                </p>
+                <p class="mb-1">
+                  <i class="bi bi-geo-alt text-primary me-2"></i>
+                  {{ selectedCenter.district }}, Lima, Perú
+                </p>
+                <p class="mb-1" *ngIf="selectedCenter.phone">
+                  <i class="bi bi-telephone-fill text-primary me-2"></i>
+                  <a href="tel:{{ selectedCenter.phone }}">{{ selectedCenter.phone }}</a>
+                </p>
+                <p class="mb-1" *ngIf="selectedCenter.email">
+                  <i class="bi bi-envelope-fill text-primary me-2"></i>
+                  <a href="mailto:{{ selectedCenter.email }}">{{ selectedCenter.email }}</a>
+                </p>
+              </div>
+              <div class="col-md-6">
+                <h6>Horario de Atención</h6>
+                <p *ngIf="selectedCenter.schedule" [innerHTML]="selectedCenter.schedule"></p>
+                <p *ngIf="!selectedCenter.schedule" class="text-muted">
+                  No se ha especificado horario de atención.
+                </p>
+                <!--<div class="mt-3">
+                  <span class="badge" [ngClass]="selectedCenter.is_active ? 'bg-success' : 'bg-secondary'">
+                    {{ selectedCenter.is_active ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </div>-->
+              </div>
+            </div>
+            <p class="mb-0" *ngIf="selectedCenter.description">{{ selectedCenter.description }}</p>
+          </div>
+          
+          <div *ngIf="!selectedCenter" class="h-100 d-flex align-items-center justify-content-center">
+            <div class="text-center text-muted">
+              <i class="bi bi-geo-alt fs-1"></i>
+              <p class="mt-2">Seleccione un centro de apoyo para ver los detalles</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Filters Section -->
+    <div class="col-lg-3">
+      <div class="card mb-4">
+        <div class="card-header">
+          <h5 class="mb-0">Filtros de Búsqueda</h5>
+        </div>
+        <div class="card-body">
+          
+          <div class="mb-3">
+            <label for="zone" class="form-label">Zona</label>
+            <select class="form-select mb-3" id="zone" [(ngModel)]="selectedZone" (change)="updateFilters()">
+              <option *ngFor="let zone of zones" [value]="zone">
+                {{ zone }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="district" class="form-label">Distrito</label>
+            <select class="form-select" id="district" [(ngModel)]="selectedDistrict" (change)="applyFilters()" [disabled]="!selectedZone && selectedZone !== ''">
+              <option value="">Todos los distritos</option>
+              <option *ngFor="let district of districts" [value]="district">
+                {{ formatDistrictName(district) }}
+              </option>
+            </select>
+          </div>
+          
+          <button class="btn btn-outline-secondary w-100" (click)="clearFilters()">
+            Limpiar Filtros
+          </button>
+        </div>
+      </div>
+      
+      <!-- Support Centers List -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Centros de Apoyo</h5>
+        </div>
+        <div class="list-group list-group-flush" style="max-height: 500px; overflow-y: auto;">
+          <button *ngFor="let center of filteredCenters" 
+                  (click)="selectCenter(center)"
+                  [class.active]="selectedCenter?.id === center.id"
+                  class="list-group-item list-group-item-action">
+            <h6 class="mb-1">{{ center.name }}</h6>
+            <small class="text-muted" >
+              <i class="bi bi-geo-alt"></i> {{ center.street }}
+            </small>
+          </button>
+          <div *ngIf="filteredCenters.length === 0" class="p-3 text-center text-muted">
+            No se encontraron centros con los filtros seleccionados
+          </div>
+        </div>
+      </div>
+    </div>
+    
+
+  </div>
+</main>

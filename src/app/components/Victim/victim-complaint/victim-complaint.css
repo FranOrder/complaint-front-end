@@ -1,0 +1,29 @@
+:root {
+    --primary-color: #b497bd;
+    --secondary-color: #e6daf5;
+    --sidebar-primary: #8367bf;
+    --sidebar: #ceebf5f2;
+    --white: #faf7ff;
+}
+.welcome-header {
+    background-color: #e6daf5;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+.btn {
+    background-color: #faf7ff;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    margin-right: 80px;
+   
+}
+
+.btn:hover {
+    background-color: #b497bd;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+
+}

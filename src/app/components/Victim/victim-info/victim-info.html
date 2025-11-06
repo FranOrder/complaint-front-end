@@ -1,0 +1,511 @@
+
+<main class="ms-sm-auto px-md-4 py-4">
+  <div class="row">
+            <div class="col-12">
+            <div class="welcome-header p-4 d-flex flex-column flex-md-row justify-content-between align-items-center lh-lg">
+                <div>
+                    <h2 class="fw-bold text-dark">Información y orientación</h2>
+                    <p class="mb-0 text-secondary">
+                        Guías rápidas, derechos, señales de alerta y cómo pedir ayuda de forma segura.
+                    </p>
+                    <small class="d-block mt-1 text-muted">
+                        <i class="bi bi-incognito"></i> Navegación discreta: no dejamos historial en esta página.
+                    </small>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    
+                    <div class="card card-info p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="bi bi-bookmark-fill me-2 fs-4 text-secondary"></i>
+                            <h4 class="fw-bold mb-0">Elige un tema</h4>
+                        </div>
+                        
+                        <div class="d-flex flex-wrap justify-content-center mb-4">
+                            <button class="btn btn-outline-secondary" (click)="scrollToSection('que-es-violencia')">Qué es la violencia</button>
+                            <button class="btn btn-outline-secondary" (click)="scrollToSection('senales-alerta')">Señales de alerta</button>
+                            <button class="btn btn-outline-secondary" (click)="scrollToSection('plan-seguridad')">Plan de seguridad</button>
+                            <button class="btn btn-outline-secondary" (click)="scrollToSection('consejos')">Consejos y apoyo</button>
+                            <button class="btn btn-outline-secondary" (click)="scrollToSection('como-denunciar')">Guía para denunciar</button>
+                            <button class="btn btn-outline-secondary" (click)="scrollToSection('preguntas-frecuentes')">Preguntas frecuentes</button>
+                        </div>
+                        
+                        <h5 id="que-es-violencia" class="fw-bold text-dark mt-2">¿Qué es la violencia de género?</h5>
+                        <p class="text-secondary">
+                            La violencia de género es una forma de desigualdad y abuso de poder que busca controlar, someter o dañar a una persona por su género. Incluye violencia física, psicológica, sexual, económica y digital, y puede darse en la pareja, la familia, el trabajo o cualquier entorno social. No siempre es visible, ya que muchas veces comienza con actitudes de control, manipulación o humillación que se agravan con el tiempo. Toda forma de violencia de género vulnera los derechos humanos y la dignidad de las personas, y nunca tiene justificación.
+                        </p>
+                        
+                        <div class="alert alert-resource p-3 mb-4 d-flex align-items-center" role="alert">
+                            <i class="bi bi-exclamation-octagon-fill me-3 fs-5" style="color: var(--bs-denuncia-bg);"></i>
+                            <div>
+                                Si estás en peligro inmediato, llama a la Línea 100 o a los números de emergencias locales** de tu país (ej. 911, 105).
+                            </div>
+                        </div>
+
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-6">
+                                <div id="senales-alerta" class="p-3 border rounded h-100">
+                                    <h6 class="fw-bold mb-2 text-dark">Señales de alerta</h6>
+                                    <p class="small text-secondary mb-3">
+                                        Control, aislamiento, insultos, amenazas, celos, revisa tus redes, limita salidas y decisiones.
+                                    </p>
+                        <button 
+                            class="btn btn-sm btn-outline-secondary" 
+                            type="button" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#alertExamplesModal">
+                            <i class="bi bi-exclamation-triangle me-1"></i> Ver señales
+                        </button>
+
+                        <div class="modal fade" id="alertExamplesModal" tabindex="-1" aria-labelledby="alertExamplesModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                                <div class="modal-content border-0 shadow-lg">
+
+                                    <div class="modal-header modal-header-custom">
+                                        <h5 class="modal-title fw-bold" id="alertExamplesModalLabel">
+                                            <i class="bi bi-exclamation-triangle-fill me-2"></i> Señales de Alerta de Violencia contra la Mujer
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-4 border-end pe-3">
+                                                <nav id="alertNav" class="h-100 flex-column align-items-stretch">
+                                                    <nav class="nav nav-pills flex-column small">
+                                                        <a class="nav-link active" href="#intro">Introducción</a>
+                                                        <a class="nav-link" href="#emocionales">💔 Señales emocionales o psicológicas</a>
+                                                        <a class="nav-link" href="#control">🔒 Señales de control o manipulación</a>
+                                                        <a class="nav-link" href="#verbal">💬 Señales de violencia verbal o simbólica</a>
+                                                        <a class="nav-link" href="#fisicas">⚠️ Señales físicas</a>
+                                                        <a class="nav-link" href="#autopercepcion">🧠 Señales en ti misma</a>
+                                                        <a class="nav-link" href="#recuerda">💜 Recuerda</a>
+                                                    </nav>
+                                                </nav>
+                                            </div>
+
+                                            <div class="col-8">
+                                                <div 
+                                                    data-bs-spy="scroll" 
+                                                    data-bs-target="#alertNav" 
+                                                    data-bs-offset="0"
+                                                    data-bs-smooth-scroll="true" 
+                                                    class="scrollspy-content ps-3 position-relative" 
+                                                    tabindex="0"
+                                                    style="height: 65vh; overflow-y: auto;">
+
+                                                    <div id="intro" class="mb-4">
+                                                        <h5 class="fw-bold">🚨 Reconocer las señales puede salvar vidas</h5>
+                                                        <p>La violencia no siempre comienza con golpes. A menudo se disfraza de amor, preocupación o protección. Empieza con frases como “te controlo porque me importas” o “sin mí no podrías vivir”.</p>
+                                                        <p>Poco a poco, la persona agresora va ganando control emocional y psicológico sobre la víctima, reduciendo su autoestima y su red de apoyo.</p>
+                                                        <p>Reconocer estas señales no es exagerar ni dramatizar: es una forma de cuidarte y prevenir que la violencia escale.</p>
+                                                        <p>Cada una de las formas de violencia que verás a continuación puede presentarse de manera sutil o evidente, pero todas son señales de alerta que deben tomarse en serio.</p>
+                                                        <p>Si identificas alguna, habla con alguien de confianza o busca orientación profesional. Pedir ayuda no es debilidad, es valentía.</p>
+                                                    </div>
+
+                                                    <div id="emocionales" class="mb-4 scrollspy-section">
+                                                        <h5 class="fw-bold">💔 Señales emocionales o psicológicas</h5>
+                                                        <p><strong>Concepto:</strong> La violencia psicológica busca controlar, humillar y debilitar emocionalmente a la persona. No deja marcas físicas, pero sí heridas invisibles que afectan la salud mental y la autoestima. Esta forma de violencia es muy común y, al no ser visible, muchas veces se normaliza.</p>
+                                                        <h6 class="fw-semibold mt-3">Ejemplos y manifestaciones:</h6>
+                                                        <ul>
+                                                            <li>Te hace sentir miedo, culpa o vergüenza con frecuencia, incluso cuando no hay motivo aparente.</li>
+                                                            <li>Te dice frases como “sin mí no serías nadie” o “nadie te va a querer como yo”.</li>
+                                                            <li>Ridiculiza tus emociones, te dice que “lloras por todo” o que “te inventas cosas”.</li>
+                                                            <li>Te culpa de su enojo o violencia: “si no me gritaras, yo no reaccionaría así”.</li>
+                                                            <li>Desvaloriza tus logros y te hace sentir que no eres suficiente.</li>
+                                                            <li>Te aísla de amigos o familiares para que dependas solo de él.</li>
+                                                            <li>Te amenaza con hacerse daño o quitarse la vida si decides alejarte.</li>
+                                                        </ul>
+                                                        <p><strong>Por qué es peligrosa:</strong> Este tipo de maltrato genera dependencia emocional, ansiedad, miedo y confusión. La víctima puede llegar a creer que merece el maltrato o que no puede salir de esa relación.</p>
+                                                        <p><strong>Qué hacer:</strong> Habla con alguien de confianza, un profesional o una línea de ayuda. Recuperar la confianza en ti misma es el primer paso para salir del ciclo del maltrato.</p>
+                                                    </div>
+
+                                                    <div id="control" class="mb-4 scrollspy-section">
+                                                        <h5 class="fw-bold">🔒 Señales de control o manipulación</h5>
+                                                        <p><strong>Concepto:</strong> La manipulación y el control son formas de violencia que buscan someter a la víctima. La persona agresora decide lo que puedes o no hacer, a quién ves y cómo vives. Al principio puede parecer cuidado, pero en realidad es una forma de quitarte autonomía.</p>
+                                                        <h6 class="fw-semibold mt-3">Ejemplos y manifestaciones:</h6>
+                                                        <ul>
+                                                            <li>Revisa tu teléfono, redes sociales o correo sin tu permiso.</li>
+                                                            <li>Te exige contestar de inmediato o justificar dónde estás y con quién.</li>
+                                                            <li>Te impide trabajar, estudiar o salir sola, argumentando que “es por tu seguridad”.</li>
+                                                            <li>Te controla económicamente, no te deja administrar tu dinero o te pide justificar tus gastos.</li>
+                                                            <li>Toma decisiones por ti, como qué ropa usar, a quién visitar o con quién hablar.</li>
+                                                            <li>Se enfurece si pasas tiempo con otras personas o si no sigues sus órdenes.</li>
+                                                        </ul>
+                                                        <p><strong>Por qué es peligrosa:</strong> Este tipo de violencia limita tu libertad y te hace perder la capacidad de decidir por ti misma. Te aísla y debilita tu red de apoyo, lo que facilita que el maltrato escale.</p>
+                                                        <p><strong>Qué hacer:</strong> Si alguien intenta controlar tus movimientos, finanzas o relaciones, no lo justifiques. Busca orientación profesional o apoyo legal — el control también es violencia.</p>
+                                                    </div>
+
+                                                    <div id="verbal" class="mb-4 scrollspy-section">
+                                                        <h5 class="fw-bold">💬 Señales de violencia verbal o simbólica</h5>
+                                                        <p><strong>Concepto:</strong> La violencia verbal y simbólica son conductas que atacan la dignidad y autoestima mediante palabras, gestos, miradas o burlas. Son una de las formas más naturalizadas de violencia, y muchas veces se confunden con “discusiones normales de pareja”.</p>
+                                                        <h6 class="fw-semibold mt-3">Ejemplos y manifestaciones:</h6>
+                                                        <ul>
+                                                            <li>Te insulta, grita o ridiculiza, especialmente en momentos de tensión.</li>
+                                                            <li>Usa bromas ofensivas o comentarios crueles sobre tu cuerpo, tu familia o tu forma de pensar.</li>
+                                                            <li>Te interrumpe, menosprecia o ignora cuando hablas.</li>
+                                                            <li>Te compara constantemente con otras personas para que sientas que no vales lo suficiente.</li>
+                                                            <li>Te culpa públicamente o te avergüenza frente a los demás.</li>
+                                                            <li>Usa miradas, tonos o gestos intimidantes para hacerte callar.</li>
+                                                        </ul>
+                                                        <p><strong>Por qué es peligrosa:</strong> Las palabras hirientes repetidas con el tiempo destruyen la autoestima y hacen que la víctima normalice la humillación. Esto suele ser el paso previo a la violencia física.</p>
+                                                        <p><strong>Qué hacer:</strong> No subestimes los insultos o burlas. Si sientes que constantemente te hacen daño con palabras, busca ayuda psicológica o legal. Nadie tiene derecho a degradarte ni a tratarte con desprecio.</p>
+                                                    </div>
+
+                                                    <div id="fisicas" class="mb-4 scrollspy-section">
+                                                        <h5 class="fw-bold">⚠️ Señales físicas</h5>
+                                                        <p><strong>Concepto:</strong> La violencia física es cualquier acto que cause daño o dolor corporal, aunque no deje heridas visibles. Incluye empujones, bofetadas, jalones, agresiones con objetos o cualquier acción que intimide o cause miedo físico.</p>
+                                                        <h6 class="fw-semibold mt-3">Ejemplos y manifestaciones:</h6>
+                                                        <ul>
+                                                            <li>Te empuja, golpea o sacude durante discusiones.</li>
+                                                            <li>Lanza objetos cerca de ti o rompe cosas para asustarte.</li>
+                                                            <li>Te agrede sexualmente, obligándote a tener relaciones sin tu consentimiento.</li>
+                                                            <li>Te impide recibir atención médica o descanso cuando estás herida o enferma.</li>
+                                                            <li>Te deja marcas o moretones y luego dice que “fue un accidente”.</li>
+                                                            <li>Te encierra o te impide salir de casa como forma de castigo o control.</li>
+                                                        </ul>
+                                                        <p><strong>Por qué es peligrosa:</strong> Es una forma de violencia delictiva y extremadamente peligrosa. Puede escalar con el tiempo y poner en riesgo tu vida o la de tus hijos.</p>
+                                                        <p><strong>Qué hacer:</strong> Si sufres agresión física o amenazas, no esperes a que empeore. Busca un lugar seguro, llama al <strong>105 (Policía)</strong> o a la <strong>Línea 100</strong>, y si puedes, documenta las lesiones. Tu vida y tu seguridad son prioridad.</p>
+                                                    </div>
+
+                                                    <div id="autopercepcion" class="mb-4 scrollspy-section">
+                                                        <h5 class="fw-bold">🧠 Señales en ti misma (cómo puedes sentirte)</h5>
+                                                        <p><strong>Concepto:</strong> Tu cuerpo y tus emociones pueden ser el primer indicador de que algo no está bien. Cuando vives violencia, es común experimentar culpa, miedo, ansiedad o confusión, incluso sin golpes o insultos visibles. Estas sensaciones son respuestas naturales al maltrato, no debilidad.</p>
+                                                        <h6 class="fw-semibold mt-3">Ejemplos y manifestaciones:</h6>
+                                                        <ul>
+                                                            <li>Te sientes triste, sola o confundida gran parte del tiempo.</li>
+                                                            <li>Vives con miedo a enojar a tu pareja o a provocar una discusión.</li>
+                                                            <li>Justificas sus conductas para evitar conflictos.</li>
+                                                            <li>Te culpas a ti misma por lo que ocurre.</li>
+                                                            <li>Sientes que ya no puedes decidir libremente o que no tienes energía para hacerlo.</li>
+                                                            <li>Evitas contarle a otros por miedo, vergüenza o desconfianza.</li>
+                                                            <li>Tienes ansiedad, insomnio o ataques de pánico por las discusiones o amenazas.</li>
+                                                        </ul>
+                                                        <p><strong>Por qué es peligrosa:</strong> El maltrato emocional sostenido puede causar depresión, estrés postraumático o pérdida de autoestima. Esto hace más difícil reconocer el abuso y buscar ayuda.</p>
+                                                        <p><strong>Qué hacer:</strong> Confía en tus emociones: si algo te hace daño, no es normal. Busca ayuda profesional o comunícate con los servicios de atención. Hablar es el primer paso para sanar.</p>
+                                                    </div>
+
+                                                    <div id="recuerda" class="scrollspy-section">
+                                                        <h5 class="fw-bold text-danger">💜 Recuerda</h5>
+                                                        <p>La violencia nunca es tu culpa.</p>
+                                                        <p>Nadie tiene derecho a lastimarte, controlarte o humillarte.</p>
+                                                        <p>Hablar y pedir ayuda es un acto de valentía.</p>
+                                                        <p>Si estás en Perú, puedes comunicarte con:</p>
+                                                        <ul>
+                                                            <li><strong>Línea 100:</strong> atención gratuita y confidencial las 24 horas.</li>
+                                                            <li><strong>Chat 100:</strong> orientación virtual.</li>
+                                                            <li><strong>Centros de Emergencia Mujer (CEM):</strong> apoyo legal, psicológico y social.</li>
+                                                            <li><strong>Policía Nacional (105):</strong> si tu vida o la de alguien está en peligro inmediato.</li>
+                                                        </ul>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="plan-seguridad" class="p-3 border rounded h-100">
+                                    <h6 class="fw-bold mb-2 text-dark">Plan de seguridad</h6>
+                                    <p class="small text-secondary mb-3">
+                                        Define contactos de confianza, rutas de salida, una palabra clave y copia de documentos.
+                                    </p>
+                                    <button 
+                                        class="btn btn-sm btn-outline-secondary" 
+                                        type="button" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#safetyPlanModal">
+                                        <i class="bi bi-journal-plus me-1"></i> Recomendaciones
+                                    </button>
+
+                                    <!-- Safety Plan Modal -->
+                                    <div class="modal fade" id="safetyPlanModal" tabindex="-1" aria-labelledby="safetyPlanModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                                            <div class="modal-content border-0 shadow-lg">
+                                                <div class="modal-header modal-header-custom">
+                                                    <h5 class="modal-title fw-bold" id="safetyPlanModalLabel">
+                                                        <i class="bi bi-shield-check me-2"></i> 🛡️ Plan de Seguridad Personal
+                                                    </h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                                                </div>
+
+                                                <div class="modal-body">
+                                                    <div class="row">
+                                                        <div class="col-4 border-end pe-3">
+                                                            <nav id="safetyPlanNav" class="h-100 flex-column align-items-stretch">
+                                                                <nav class="nav nav-pills flex-column small">
+                                                                    <a class="nav-link active" href="#safetyIntro">Introducción</a>
+                                                                    <a class="nav-link" href="#safetyContacts">📞 Contactos de confianza</a>
+                                                                    <a class="nav-link" href="#safetyRoutes">🏃‍♀️ Rutas de salida</a>
+                                                                    <a class="nav-link" href="#safetyKeyword">🗝️ Palabra clave</a>
+                                                                    <a class="nav-link" href="#safetyDocuments">📂 Documentos</a>
+                                                                    <a class="nav-link" href="#safetyResources">💬 Recursos de ayuda</a>
+                                                                    <a class="nav-link" href="#safetyRemember">💜 Recuerda</a>
+                                                                </nav>
+                                                            </nav>
+                                                        </div>
+
+                                                        <div class="col-8">
+                                                            <div 
+                                                                data-bs-spy="scroll" 
+                                                                data-bs-target="#safetyPlanNav" 
+                                                                data-bs-offset="0"
+                                                                data-bs-smooth-scroll="true" 
+                                                                class="scrollspy-content ps-3 position-relative" 
+                                                                tabindex="0"
+                                                                style="height: 65vh; overflow-y: auto;">
+
+                                                                <div id="safetyIntro" class="mb-4">
+                                                                    <h5 class="fw-bold">Toma el control de tu seguridad</h5>
+                                                                    <p>Tener un plan de seguridad es una herramienta esencial para proteger tu vida y la de tus seres queridos ante cualquier situación de violencia o amenaza.</p>
+                                                                    <p>No siempre puedes controlar lo que hace una persona agresora, pero sí puedes anticiparte, prepararte y actuar de manera más segura.</p>
+                                                                    <p>Este plan no es señal de miedo, sino de autocuidado y prevención. Te ayuda a tomar el control sobre tus decisiones, tu entorno y tus recursos en momentos de crisis.</p>
+                                                                    <p>Diseñarlo con calma, antes de una emergencia, puede marcar la diferencia entre el peligro y la protección.</p>
+                                                                </div>
+
+                                                                <div id="safetyContacts" class="mb-4 scrollspy-section">
+                                                                    <h5 class="fw-bold">📞 1. Define tus contactos de confianza</h5>
+                                                                    <p><strong>Concepto:</strong> Los contactos de confianza son personas en quienes puedes apoyarte sin miedo ni juicio. Son tu red de seguridad: quienes pueden ayudarte a salir de una situación peligrosa, llamarte, acompañarte o pedir ayuda por ti.</p>
+                                                                    <p>Contar con ellos es vital porque la violencia suele aislarte, y tener apoyo emocional o práctico rompe ese aislamiento y refuerza tu seguridad.</p>
+                                                                    <h6 class="fw-semibold mt-3">Qué hacer:</h6>
+                                                                    <ul>
+                                                                        <li>Elige entre familiares, amigos, vecinos o compañeros en los que confíes plenamente.</li>
+                                                                        <li>Explícales tu situación y acuerden cómo actuar si sospechan que estás en peligro.</li>
+                                                                        <li>Establece una palabra clave o frase secreta para alertarlos sin levantar sospechas.</li>
+                                                                        <li>Guarda sus contactos bajo nombres neutros o códigos, y anótalos también fuera del teléfono.</li>
+                                                                        <li>Si tienes hijos, enséñales a identificar a quién pueden acudir y cómo pedir ayuda.</li>
+                                                                    </ul>
+                                                                </div>
+
+                                                                <div id="safetyRoutes" class="mb-4 scrollspy-section">
+                                                                    <h5 class="fw-bold">🏃‍♀️ 2. Planifica rutas de salida seguras</h5>
+                                                                    <p><strong>Concepto:</strong> Tener rutas de salida seguras es anticipar cómo escapar de una situación violenta sin improvisar. En momentos de peligro, los nervios o el miedo pueden bloquearte, por eso es importante planear con tiempo y conocer tus opciones.</p>
+                                                                    <p>Una ruta de salida es más que un camino físico: es una estrategia para salir del control y buscar un entorno seguro.</p>
+                                                                    <h6 class="fw-semibold mt-3">Qué hacer:</h6>
+                                                                    <ul>
+                                                                        <li>Identifica puertas, ventanas y accesos por donde puedas salir rápidamente.</li>
+                                                                        <li>Memoriza o ensaya cómo reaccionarías si necesitas huir.</li>
+                                                                        <li>Define un lugar seguro al que puedas ir: casa de un familiar, comisaría o refugio cercano.</li>
+                                                                        <li>Prepara una bolsa de emergencia con lo necesario (documentos, dinero, llaves, medicinas).</li>
+                                                                        <li>Si tienes hijos, practiquen juntos cómo actuar sin causar alarma.</li>
+                                                                    </ul>
+                                                                </div>
+
+                                                                <div id="safetyKeyword" class="mb-4 scrollspy-section">
+                                                                    <h5 class="fw-bold">🗝️ 3. Crea una palabra clave o señal de emergencia</h5>
+                                                                    <p><strong>Concepto:</strong> Una palabra clave o señal es una herramienta discreta y eficaz para pedir ayuda sin que el agresor lo sepa.</p>
+                                                                    <p>Las personas que sufren violencia muchas veces no pueden pedir auxilio directamente, por eso crear una señal acordada con tus contactos puede activar una respuesta rápida y segura.</p>
+                                                                    <h6 class="fw-semibold mt-3">Qué hacer:</h6>
+                                                                    <ul>
+                                                                        <li>Elige una palabra sencilla o frase cotidiana, como "comprar pan" o "voy tarde".</li>
+                                                                        <li>Avisa a tus contactos que, si escuchan o leen esa palabra, deben llamar a la policía o acercarse a ayudarte.</li>
+                                                                        <li>Puedes usar también una señal visual (por ejemplo, una toalla colgada en la ventana o una luz encendida a cierta hora).</li>
+                                                                        <li>En el entorno digital, puedes enviar un emoji o mensaje codificado previamente acordado.</li>
+                                                                    </ul>
+                                                                    <p class="mt-3"><strong>Recuerda:</strong> la eficacia de esta medida depende de que tus contactos sepan exactamente cómo actuar.</p>
+                                                                </div>
+
+                                                                <div id="safetyDocuments" class="mb-4 scrollspy-section">
+                                                                    <h5 class="fw-bold">📂 4. Prepara una copia de tus documentos y objetos esenciales</h5>
+                                                                    <p><strong>Concepto:</strong> Tener copias de tus documentos y pertenencias más importantes es una forma de asegurar tu identidad y tus derechos si necesitas salir rápidamente.</p>
+                                                                    <p>Durante una situación de violencia, el agresor puede retener tus papeles o dinero para impedir que te vayas. Mantenerlos a salvo es una medida de autonomía y protección legal.</p>
+                                                                    <h6 class="fw-semibold mt-3">Qué hacer:</h6>
+                                                                    <ul>
+                                                                        <li>Guarda en un sobre o bolso: DNI, documentos de tus hijos, dinero, tarjetas, llaves, medicinas y números de contacto.</li>
+                                                                        <li>Deja ese kit con una persona de confianza o en un lugar al que solo tú puedas acceder.</li>
+                                                                        <li>Realiza copias digitales (fotografías o archivos) protegidas con contraseña o en una nube segura.</li>
+                                                                        <li>Añade también documentos médicos o legales que puedan ser útiles al denunciar.</li>
+                                                                        <li>Si puedes, prepara una muda de ropa y artículos de higiene personal.</li>
+                                                                    </ul>
+                                                                </div>
+
+                                                                <div id="safetyResources" class="mb-4 scrollspy-section">
+                                                                    <h5 class="fw-bold">💬 5. Conoce tus recursos de ayuda</h5>
+                                                                    <p><strong>Concepto:</strong> Conocer los servicios de apoyo disponibles te permite actuar con rapidez y sin miedo en caso de emergencia.</p>
+                                                                    <p>La información es poder: saber a dónde acudir y qué derechos tienes reduce el riesgo, acelera la protección y aumenta tu seguridad emocional.</p>
+                                                                    <h6 class="fw-semibold mt-3">Qué hacer:</h6>
+                                                                    <ul>
+                                                                        <li>Identifica los Centros de Emergencia Mujer (CEM), comisarías y refugios más cercanos.</li>
+                                                                        <li>Anota los principales números de ayuda:</li>
+                                                                        <ul>
+                                                                            <li>📞 <strong>Línea 100:</strong> atención gratuita, confidencial y 24/7.</li>
+                                                                            <li>💬 <strong>Chat 100:</strong> orientación virtual inmediata.</li>
+                                                                            <li>🚨 <strong>Policía Nacional (105):</strong> para emergencias.</li>
+                                                                            <li>🧡 <strong>App "Aurora":</strong> te conecta con servicios de ayuda y protección.</li>
+                                                                        </ul>
+                                                                        <li>Ten siempre un medio de comunicación alternativo (celular de emergencia o chip adicional).</li>
+                                                                    </ul>
+                                                                </div>
+
+                                                                <div id="safetyRemember" class="scrollspy-section">
+                                                                    <h5 class="fw-bold text-danger">💜 Recuerda</h5>
+                                                                    <p>Prepararte no es vivir con miedo, es cuidarte y recuperar el control sobre tu vida.</p>
+                                                                    <p>Tener un plan no es rendirse, es tomar fuerza y prevenir.</p>
+                                                                    <p>Tu seguridad es lo más importante, y nunca estás sola para enfrentar la violencia.</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 id="como-denunciar" class="fw-bold text-dark mt-2">Guía: Cómo denunciar</h5>
+                        <p class="text-secondary">
+                            Puedes denunciar hechos de violencia de forma gratuita, confidencial y sin necesidad de abogado, tanto desde esta plataforma como en comisarías, fiscalías o juzgados. Si has sufrido lesiones, acude a un centro de salud para obtener un certificado médico legal. También puedes recibir orientación y apoyo a través de la Línea 100, el Chat 100 o los Centros de Emergencia Mujer (CEM), disponibles las 24 horas.
+                        </p>
+                        <div class="d-flex gap-3">
+                            <a [routerLink]="['/victim/complaint']" class="btn btn-outline-secondary" role="button">
+                                <i class="bi bi-arrow-right-circle me-2"></i> Iniciar denuncia
+                            </a>
+                            <a [routerLink]="['/victim/map']" class="btn btn-outline-secondary" role="button">
+                                <i class="bi bi-geo-alt me-2"></i> Ver lugares de ayuda
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div id="preguntas-frecuentes" class="card card-info p-4">
+                        <h4 class="fw-bold mb-3 text-dark">Preguntas Frecuentes (FAQ)</h4>
+                        <div class="accordion" id="faqAccordion">
+                            <div class="accordion-item" >
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button class="accordion-button collapsed fw-bold "  type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        ¿Necesito un abogado para denunciar?
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body text-secondary">
+                                        No, la denuncia inicial se puede realizar sin representación legal. Sin embargo, contar con asesoría legal gratuita de tu país es crucial para el seguimiento del caso. Ofrecemos contactos acreditados.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingTwo">
+                                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        ¿Puedo denunciar de forma anónima?
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body text-secondary">
+                                        Para iniciar un proceso legal, se requiere tu identificación como víctima. Sin embargo, tus datos se mantienen confidenciales y protegidos. Las autoridades y servicios especializados mantienen la confidencialidad de toda denuncia. Nadie puede divulgar tus datos personales sin tu consentimiento.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingThree">
+                                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        ¿Qué pasa después de enviar mi denuncia?
+                                    </button>
+                                </h2>
+                                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body text-secondary">
+                                        Una vez enviada, el sistema la registra y la deriva a los profesionales correspondientes, quienes evaluarán el caso y podrán contactarte para ofrecerte orientación o derivarte al servicio más cercano de atención y protección.
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFour">
+                                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                        ¿Puedo modificar o eliminar una denuncia después de enviarla?
+                                    </button>
+                                </h2>
+                                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body text-secondary">
+                                        Por motivos de seguridad y trazabilidad, no se pueden modificar las denuncias ya enviadas. Si cometiste un error o necesitas hacer una aclaración, puedes enviar una nueva denuncia o contactar al equipo de soporte a través del correo o chat de la página.
+                                     </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingFive">
+                                    <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                       ¿Puedo denunciar si no soy la víctima, sino un testigo?
+                                    </button>
+                                </h2>
+                                <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body text-secondary">
+                                        Sí. Cualquier persona puede reportar un caso de violencia que haya presenciado o del que tenga conocimiento. Es importante brindar la información más precisa posible para que las autoridades puedan intervenir adecuadamente.
+                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    
+<div id="como-denunciar" class="card card-info p-4">
+  <h4 class="fw-bold mb-3 text-center" style="color: #8367bf;">
+    📜 Leyes que te protegen
+  </h4>
+
+  <div class="scrollable-laws p-3 rounded">
+    <p><strong>Ley N.º 30364:</strong> “Ley para prevenir, sancionar y erradicar la violencia contra las mujeres y los integrantes del grupo familiar”.</p>
+
+    <p><strong>Ley N.º 30314:</strong> “Ley para prevenir y sancionar el acoso sexual en espacios públicos”.</p>
+
+    <p><strong>Decreto Legislativo N.º 1410:</strong> Incorpora al Código Penal el delito de acoso, chantaje sexual y difusión de imágenes, materiales audiovisuales o audios con contenido sexual sin consentimiento.</p>
+
+    <p><strong>Ley N.º 30068:</strong> “Ley que incorpora el artículo 108-B al Código Penal y modifica los artículos para prevenir, sancionar y erradicar el feminicidio”.</p>
+
+    <p><strong>Ley N.º 28983:</strong> “Ley de igualdad de oportunidades entre mujeres y hombres”.</p>
+
+    <p><strong>Ley N.º 31153:</strong> “Ley que promueve la inserción laboral de las mujeres víctimas de toda forma de violencia en los programas que ejecutan las entidades de la Administración Pública”.</p>
+
+    <p><strong>Ley N.º 31715:</strong> Modifica la Ley 30364 para eliminar obstáculos y fortalecer su ejecución.</p>
+
+    <p><strong>Ley N.º 31613:</strong> “Ley que promueve el acceso a la vivienda para mujeres víctimas de violencia e incorpora instituciones para asignar bienes inmuebles a hogares de refugio temporal”.</p>
+
+    <p><strong>Ley N.º 27942:</strong> “Ley de Prevención y Sanción del Hostigamiento Sexual”.</p>
+  </div>
+</div>
+
+
+                   <div id="consejos" class="card card-info p-4">
+                        <h4 class="fw-bold mb-3 text-center" style="color: #8367bf;">Si estás viviendo violencia</h4>
+                        <ul class="list-unstyled small text-secondary lh-lg">
+                            <li><i class="bi bi-people-fill" style="color: #8367bf;"></i>   No estás sola. Busca apoyo de personas de confianza o de instituciones especializadas.</li>
+                            <li><i class="bi bi-shield-lock" style="color: #8367bf;"></i>   Evita confrontar directamente al agresor, especialmente si crees que puede reaccionar con violencia.</li>
+                            <li><i class="bi bi-folder2-open" style="color: #8367bf;"></i>   Guarda evidencias (mensajes, fotos, grabaciones, informes médicos) de manera segura.</li>
+                            <li><i class="bi bi-briefcase" style="color: #8367bf;"></i>   Prepara un plan de emergencia: ten a la mano tus documentos, dinero y un lugar seguro al que puedas ir.</li>
+                            <li><i class="bi bi-telephone-fill" style="color: #8367bf;"></i>   Llama a las líneas de ayuda (por ejemplo, en Perú: Línea 100, Chat 100 o Centros de Emergencia Mujer).</li>
+
+                        </ul>
+                    </div>
+                    
+                    <div class="card card-info p-4">
+                        <h4 class="fw-bold mb-3 text-center" style="color: #8367bf;">Si conoces a alguien que sufre violencia</h4>
+                        <ul class="list-unstyled small text-secondary lh-lg">
+                            <li><i class="bi bi-ear" style="color: #8367bf;"></i>   Escucha sin juzgar. No la culpes ni la presiones a tomar decisiones.</li>
+                            <li><i class="bi bi-person-workspace" style="color: #8367bf;"></i>   Ofrece ayuda concreta: acompañarla a denunciar, cuidar a sus hijos, o simplemente estar disponible.</li>
+                            <li><i class="bi bi-clock" style="color: #8367bf;"></i>   Respeta su ritmo. Salir de una relación violenta puede ser un proceso difícil y lento.</li>
+                            <li><i class="bi bi-book" style="color: #8367bf;"></i>   Infórmate. Conocer cómo funcionan los servicios de apoyo te permitirá orientar mejor.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="d-flex justify-content-between text-secondary mt-5 pt-3 border-top">
+                <small>© 2025 Red Segura</small>
+                <div>
+                    <small class="me-3">Política de privacidad</small>
+                    <small>Aviso legal</small>
+                </div>
+            </footer>
+
+        
+    </div>
+</div>
+</main>

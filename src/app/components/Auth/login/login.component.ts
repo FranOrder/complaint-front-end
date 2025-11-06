@@ -54,7 +54,7 @@ export class LoginComponent implements OnInit {
     
     this.authService.login({ email, password }).subscribe({
       next: () => {
-        this.router.navigate(['/home']);
+        this.router.navigate(['/victim/home']);
       },
       error: (error) => {
         this.error = error.error?.message || 'Credenciales inválidas. Por favor, inténtalo de nuevo.';
@@ -67,7 +67,7 @@ export class LoginComponent implements OnInit {
   }
 
   // Navigate to register page
-  navigateToRegister(): void {
-    this.router.navigate(['/register']);
-  }
+ navigateToRegister(): void {
+  this.router.navigate(['/auth/register']);
+}
 }

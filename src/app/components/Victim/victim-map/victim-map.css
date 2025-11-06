@@ -1,0 +1,158 @@
+:root {
+    --primary-color: #b497bd;
+    --secondary-color: #e6daf5;
+    --sidebar-primary: #8367bf;
+    --sidebar: #ceebf5f2;
+    --white: #faf7ff;
+}/* General Styles */
+.victim-map-container {
+  min-height: calc(100vh - 200px);
+}
+
+/* Card Styles */
+.card {
+  border: none;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  font-weight: 600;
+}
+
+/* List Group Styles */
+.list-group-item {
+  border-left: none;
+  border-right: none;
+  padding: 1rem 1.25rem;
+  transition: all 0.2s;
+}
+
+.list-group-item:first-child {
+  border-top: none;
+}
+
+.list-group-item:last-child {
+  border-bottom: none;
+}
+
+.list-group-item:hover, 
+.list-group-item.active {
+  background-color: #e6daf5;
+  border-color: rgba(0, 0, 0, 0.125);
+  color: #1a4b63;
+}
+
+.list-group-item.active {
+  border-left: 3px solid #8367bf;
+  font-weight: 500;
+  
+}
+
+/* Map Container */
+.map-container {
+  border-radius: 0.25rem;
+  overflow: hidden;
+  background-color: #faf7ff;
+}
+.card-header {
+  background-color: #8367bf;
+  color: white;
+}
+
+
+
+.welcome-header {
+    background-color: #e6daf5;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+.btn {
+    background-color: #faf7ff;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    margin-right: 80px;
+   
+}
+
+.btn:hover {
+    background-color: #b497bd;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  .map-container {
+    height: 300px;
+  }
+}
+
+/* Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Custom Badge Styles */
+.badge {
+  font-weight: 500;
+  padding: 0.4em 0.8em;
+}
+
+/* Form Control Styles */
+.form-select:focus, 
+.form-control:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+}
+
+/* Icon Styles */
+.bi {
+  margin-right: 0.25rem;
+}
+
+/* Active State for List Items */
+.list-group-item.active .text-muted {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Link Styles */
+a {
+  color: #0d6efd;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a:hover {
+  color: #0a58ca;
+  text-decoration: underline;
+}

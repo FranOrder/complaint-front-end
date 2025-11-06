@@ -1,0 +1,125 @@
+:root {
+    --primary-color: #b497bd;
+    --secondary-color: #e6daf5;
+    --sidebar-primary: #8367bf;
+    --sidebar: #ceebf5f2;
+    --white: #faf7ff;
+}
+
+.card-info {
+    border: none;
+    box-shadow: 0 4px 8px #8367bf5b;
+    margin-bottom: 20px;
+    background-color: white;
+}
+
+.alert-resource {
+    background-color: #e6daf5;
+    border-left: 5px solid var(--bs-denuncia-bg);
+    color: var(--bs-text-color);
+}
+
+.welcome-header {
+    background-color: #e6daf5;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+/* 🔘 Botones del menú principal */
+.btn {
+    background-color: #faf7ff;
+    border: 2px solid #b497bd;
+    border-radius: 12px;
+    margin: 10px;
+    color: #2c6483;
+    font-weight: 500;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    flex: 1 1 200px; /* 🔹 Esto hace que todos los botones tengan el mismo ancho base */
+    min-width: 200px; /* 🔹 Ancho mínimo uniforme */
+    max-width: 220px; /* 🔹 Evita que crezcan demasiado */
+    height: 60px; /* 🔹 Altura uniforme */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.btn:hover {
+    background-color: #b497bd;
+    color: #fff;
+    transform: scale(1.05);
+}
+
+/* 🔹 Alineación del contenedor de botones */
+.d-flex.flex-wrap.justify-content-center.mb-4 {
+    gap: 15px;
+}
+.accordion-button { background-color: #e6daf5; }
+/* 🔸 Estilo del scrollspy del modal */
+.modal-header-custom {
+    background-color: #b497bd;
+    color: white;
+}
+
+/* 🔸 Navegación dentro del modal */
+.nav-link {
+    background-color: #ceebf5f2;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    color: #2c6483;
+    font-weight: 500;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link.active {
+    background-color: #8367bf;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-link:hover {
+    background-color: #8367bf;
+    color: #faf7ff;
+}
+
+.scrollable-laws {
+  max-height: 350px; 
+  overflow-y: auto; 
+  background-color: #f8f5fc; 
+  border-left: 5px solid #b497bd;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.scrollable-laws::-webkit-scrollbar {
+  width: 8px;
+}
+.scrollable-laws::-webkit-scrollbar-track {
+  background: #f0e8fa;
+  border-radius: 10px;
+}
+.scrollable-laws::-webkit-scrollbar-thumb {
+  background: #b497bd;
+  border-radius: 10px;
+}
+.scrollable-laws::-webkit-scrollbar-thumb:hover {
+  background: #8367bf;
+}
+
+.scrollable-laws p {
+  margin-bottom: 1rem;
+  color: #2c2c2c;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+.scrollable-laws strong {
+  color: #8367bf;
+}

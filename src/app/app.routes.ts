@@ -1,31 +1,66 @@
 import { Routes } from '@angular/router';
-import { LoginComponent } from './components/Auth/login/login.component';
-import { RegisterComponent } from './components/Auth/register/register.component';
-import { VictimHomeComponent } from './components/Victim/victim-home/victim-home';
 import { AuthGuard } from './guards/auth.guard';
+import { RoleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
-  { 
-    path: 'login', 
-    component: LoginComponent 
+  {
+    path: '',
+    redirectTo: 'auth/login',
+    pathMatch: 'full'
   },
-  { 
-    path: 'register', 
-    component: RegisterComponent 
+  {
+    path: 'auth',
+    loadChildren: () => import('./components/Auth/auth.module').then(m => m.AuthModule)
   },
-  { 
-    path: 'home', 
-    component: VictimHomeComponent,
-    canActivate: [AuthGuard] 
+  {
+    path: 'victim',
+    canActivate: [AuthGuard],
+    loadComponent: () => import('./components/Victim/victim-home/victim-home').then(m => m.VictimHomeComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'home',
+        pathMatch: 'full'
+      },
+      {
+        path: 'home',
+        loadComponent: () => import('./components/Victim/victim-home/victim-home').then(m => m.VictimHomeComponent)
+      },
+      {
+        path: 'complaint',
+        loadComponent: () => import('./components/Victim/victim-complaint/victim-complaint').then(m => m.VictimComplaintComponent)
+      },
+      {
+        path: 'chat',
+        loadComponent: () => import('./components/Victim/victim-chat/victim-chat').then(m => m.VictimChatComponent)
+      },
+      {
+        path: 'map',
+        loadComponent: () => import('./components/Victim/victim-map/victim-map').then(m => m.VictimMapComponent)
+      },
+      {
+        path: 'info',
+        loadComponent: () => import('./components/Victim/victim-info/victim-info').then(m => m.VictimInfoComponent)
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./components/Victim/victim-profile/victim-profile').then(m => m.VictimProfileComponent)
+      },
+      {
+        path: '**',
+        redirectTo: 'home'
+      }
+    ]
   },
-  { 
-    path: '', 
-    redirectTo: '/login', 
-    pathMatch: 'full' 
+  {
+    path: 'admin',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'ADMIN' },
+    loadComponent: () => import('./components/admin-users/admin-dashboards/admin-dashboard.component').then(m => m.AdminDashboardComponent)
   },
-  { 
-    path: '**', 
-    redirectTo: '/login' 
+  {
+    path: '**',
+    redirectTo: 'auth/login'
   }
 ];
 
