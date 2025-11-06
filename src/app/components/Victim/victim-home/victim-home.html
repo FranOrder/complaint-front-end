@@ -1,0 +1,122 @@
+<nav class="navbar bg-light border-bottom">
+    <div class="container-fluid">
+        <span class="navbar-brand fw-bold ms-3"><img [src]="logoPath" alt="logo" style="width: 40px; height: 40px;" class="me-2">Red Segura</span>
+        <div class="d-flex align-items-center me-3" *ngIf="user">
+            <span class="me-3 d-none d-md-inline" style="color: #867ec9; font-weight: bold; font-size: 20px;">
+                {{ user.firstName }} {{ user.lastName || '' }}
+            </span>
+            <div class="dropdown" #userDropdown>
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-person-circle me-1"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li><a class="dropdown-item" [routerLink]="['/victim/profile']"><i class="bi bi-person me-2"></i>Perfil</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" (click)="logout($event)">
+                        <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+
+        <div class="col-md-3 col-lg-2 sidebar d-none d-md-block">
+
+            <nav class="nav flex-column">
+                <a class="nav-link" 
+                   [routerLink]="['/victim/home']" 
+                   routerLinkActive="active" 
+                   [routerLinkActiveOptions]="{exact: true}">
+                    <i class="bi bi-house-door-fill me-2"></i> Inicio
+                </a>
+                <a class="nav-link" 
+                   [routerLink]="['/victim/complaint']" 
+                   routerLinkActive="active">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Denunciar
+                </a>
+                <a class="nav-link" 
+                   [routerLink]="['/victim/chat']" 
+                   routerLinkActive="active">
+                    <i class="bi bi-chat-dots-fill me-2"></i> Chat
+                </a>
+                <a class="nav-link" 
+                   [routerLink]="['/victim/map']" 
+                   routerLinkActive="active">
+                    <i class="bi bi-geo-alt-fill me-2"></i> Mapa
+                </a>
+                <a class="nav-link" 
+                   [routerLink]="['/victim/info']" 
+                   routerLinkActive="active">
+                    <i class="bi bi-info-circle-fill me-2"></i> Información
+                </a>
+            </nav>
+        </div>
+
+        <main class="col-md-9 col-lg-10 ms-sm-auto px-md-4 py-4" style="background-color: var(--bs-primary-light);">
+            <!-- Contenido del dashboard -->
+            <div *ngIf="showDashboard()">
+                <div class="welcome-header p-4 d-flex flex-column flex-md-row justify-content-between align-items-center lh-lg">
+                    <div>
+                        <h2 class="fw-bold mb-2">Bienvenida {{ user.firstName }}. Estás en un espacio seguro.</h2>
+                        <p class="mb-0" style="font-size: 18px;">Puedes denunciar de forma confidencial, hablar con una profesional, encontrar ayuda cercana y leer información para tu protección.</p>
+                        <small class="d-block mt-2 fst-italic"><i class="bi bi-lock-fill"></i> Todo está cifrado y tu actividad es privada.</small>
+                    </div>
+                    <button class="btn btn-light text-danger fw-bold mt-3 mt-md-0" type="button" [routerLink]="['/victim/complaint']">
+                        <i class="bi bi-exclamation-octagon-fill"></i> Denunciar ahora
+                    </button>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-md-6">
+                        <div class="card card-fast-access p-3">
+                            <h5 class="ms-4 fw-bold">Accesos rápidos</h5>
+                            <br>
+                            <div class="ms-4 d-flex flex-wrap gap-4">
+                                <button class="btn btn-outline-secondary" type="button" [routerLink]="['/victim/chat']">
+                                    <i class="bi bi-chat-dots-fill"></i> Chat y contacto
+                                </button>
+                                <button class="btn btn-outline-secondary" type="button" [routerLink]="['/victim/map']">
+                                    <i class="bi bi-map-fill"></i> Mapa de ayuda
+                                </button>
+                                <button class="btn btn-outline-secondary" type="button" [routerLink]="['/victim/info']">
+                                    <i class="bi bi-book-fill"></i> Información útil
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card card-fast-access p-3">
+                            <h5 class="ms-4 fw-bold">Consejos rápidos de seguridad</h5>
+                            <ul class="ms-4 list-unstyled mb-0 lh-lg" style="font-size: 18px;">
+                                <li><i class="bi bi-arrow-right"></i> Borra el historial si compartes dispositivo.</li>
+                                <li><i class="bi bi-arrow-right"></i> Usa un correo seguro que solo tú controles.</li>
+                                <li><i class="bi bi-arrow-right"></i> Si estás en peligro inmediato, llama a 100 o 105.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-warning d-flex align-items-center justify-content-center fw-bold p-3" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                    Si corres peligro, llama a 100 o 105
+                </div>
+
+                <footer class="d-flex justify-content-between text-secondary mt-5 pt-3 border-top">
+                    <small>© 2025 Red Segura</small>
+                    <div>
+                        <small class="me-3">Política de privacidad</small>
+                        <small>Aviso legal</small>
+                    </div>
+                </footer>
+            </div>
+            
+            <!-- Aquí se cargarán los componentes de las rutas -->
+            <router-outlet></router-outlet>
+        </main>
+    </div>
+</div>

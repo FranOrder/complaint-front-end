@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './components/Auth/login/login.component';
 import { RegisterComponent } from './components/Auth/register/register.component';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { VictimHomeComponent } from './components/Victim/victim-home/victim-home';
 import { AuthGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -14,8 +14,8 @@ export const routes: Routes = [
     component: RegisterComponent 
   },
   { 
-    path: 'dashboard', 
-    component: DashboardComponent,
+    path: 'home', 
+    component: VictimHomeComponent,
     canActivate: [AuthGuard] 
   },
   { 

@@ -1,0 +1,92 @@
+:root {
+    --primary-color: #b497bd;
+    --secondary-color: #e6daf5;
+    --sidebar-primary: #8367bf;
+    --sidebar: #ceebf5f2;
+    --white: #faf7ff;
+}
+.sidebar {
+    background-color: #ceebf5f2;
+    min-height: 100vh;
+    padding-top: 50px;
+}
+
+.navbar {
+    background-color: #faf7ff;
+    padding: 10px 20px;
+  padding-bottom:0%;
+  font-size: 44px;
+  
+}
+
+.welcome-header {
+    background-color: #e6daf5;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.card {
+    background-color: #faf7ff;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.btn {
+    background-color: #faf7ff;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.btn:hover {
+    background-color: #b497bd;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+}
+
+.nav-link {
+    background-color: #ceebf5f2;
+    padding: 15px 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    color: #2c6483;
+    font-weight: 500;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.nav-link:hover {
+    background-color: #b3d9e6;
+    color: #1a4b63;
+    transform: translateX(5px);
+}
+
+.nav-link.active {
+    background-color: #8367bf;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-link.active i {
+    color: white;
+}
+.nav-link:hover {
+    background-color: #8367bf;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    color: #faf7ff;
+}
+.navbar-brand{
+    font-size: 25px;
+    color: #8367bf;  
+}
+
+
