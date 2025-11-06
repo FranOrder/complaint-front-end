@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, 
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
+import { AuthService } from '../../../services/auth.service';
 
 // Core Services
 import { ComplaintService } from '../../../services/complaint.service';
@@ -43,7 +44,8 @@ export class VictimComplaintComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private complaintService: ComplaintService,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {
     this.complaintForm = this.fb.group({
       // Step 1
@@ -149,11 +151,14 @@ export class VictimComplaintComponent implements OnInit {
   }
 
   async onSubmit() {
-    // Check if user is logged in
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-    if (!currentUser?.token) {
-      alert('Por favor, inicia sesión para enviar una denuncia.');
-      this.router.navigate(['/login']);
+    // Check if user is logged in using AuthService
+    if (!this.authService.isAuthenticated()) {
+      // Redirect to login with return URL
+      this.router.navigate(['/login'], { 
+        queryParams: { 
+          returnUrl: this.router.routerState.snapshot.url 
+        } 
+      });
       return;
     }
 

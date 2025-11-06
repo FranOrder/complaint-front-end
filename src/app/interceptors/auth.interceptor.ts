@@ -18,6 +18,11 @@ export function authInterceptor(request: HttpRequest<unknown>, next: HttpHandler
     });
   }
 
+  // Skip adding token for complaints endpoint
+  if (request.url.includes('/api/v1/complaints') && request.method === 'POST') {
+    return next(request);
+  }
+
   return next(request).pipe(
     catchError((error: HttpErrorResponse) => {
     if (error.status === 401) {

@@ -22,10 +22,7 @@ export const routes: Routes = [
         redirectTo: 'home',
         pathMatch: 'full'
       },
-      {
-        path: 'home',
-        loadComponent: () => import('./components/Victim/victim-home/victim-home').then(m => m.VictimHomeComponent)
-      },
+      
       {
         path: 'complaint',
         loadComponent: () => import('./components/Victim/victim-complaint/victim-complaint').then(m => m.VictimComplaintComponent)

@@ -87,7 +87,7 @@ export class VictimMapComponent implements OnInit {
   }
   
   loadSupportCenters() {
-    this.http.get<SupportCenter[]>(`${environment.apiUrl}/api/v1/support-centers`).subscribe({
+    this.http.get<SupportCenter[]>(`${environment.apiUrl}/support-centers`).subscribe({
       next: (data) => {
         console.log('Datos recibidos del backend:', JSON.stringify(data, null, 2));
         this.supportCenters = data;

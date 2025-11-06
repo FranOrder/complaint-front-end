@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpEvent } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, tap, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 interface Complaint {
@@ -30,32 +30,53 @@ interface FileMetadata {
   providedIn: 'root'
 })
 export class ComplaintService {
-  private apiUrl = `${environment.apiUrl}/api/v1/complaints`;
+  private apiUrl = `${environment.apiUrl}/complaints`;
 
   constructor(private http: HttpClient) { }
 
   // Create a new complaint
-  // In complaint.service.ts
-// En complaint.service.ts
-createComplaint(complaintData: Omit<Complaint, 'id'>): Observable<Complaint> {
-  const formattedData = this.formatComplaintData(complaintData);
-  
-  return this.http.post<Complaint>(this.apiUrl, formattedData, {
-    headers: new HttpHeaders({
-      'Content-Type': 'application/json'
-    })
-  }).pipe(
-    tap(response => console.log('Denuncia creada exitosamente:', response)),
-    catchError(error => {
-      console.error('Error al crear la denuncia:', error);
-      return throwError(() => error);
-    })
-  );
-}
+  createComplaint(complaintData: Omit<Complaint, 'id'>): Observable<Complaint> {
+    // Validate required fields
+    if (!complaintData.description || !complaintData.violenceType || !complaintData.aggressorFullName) {
+      return throwError(() => new Error('Los campos descripción, tipo de violencia y nombre del agresor son obligatorios'));
+    }
+
+    const formattedData = this.formatComplaintData(complaintData);
+    
+    // Get the token from localStorage
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      return throwError(() => new Error('No se encontró el token de autenticación. Por favor, inicia sesión nuevamente.'));
+    }
+    
+    // Create headers with the token
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+
+    return this.http.post<Complaint>(this.apiUrl, formattedData, { headers })
+      .pipe(
+        tap(response => console.log('Denuncia creada exitosamente:', response)),
+        catchError(error => {
+          console.error('Error al crear la denuncia:', error);
+          return throwError(() => error);
+        })
+      );
+  }
 
   // Get all complaints for the current user
   getComplaints(): Observable<Complaint[]> {
+    // Get the token from localStorage
+    const token = localStorage.getItem('auth_token');
+    
+    // Create headers with the token
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
     return this.http.get<Complaint[]>(`${this.apiUrl}/my-complaints`, {
+      headers,
       withCredentials: true
     }).pipe(
       catchError(this.handleError)
@@ -64,7 +85,16 @@ createComplaint(complaintData: Omit<Complaint, 'id'>): Observable<Complaint> {
 
   // Get a single complaint by ID
   getComplaintById(id: number): Observable<Complaint> {
+    // Get the token from localStorage
+    const token = localStorage.getItem('auth_token');
+    
+    // Create headers with the token
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
     return this.http.get<Complaint>(`${this.apiUrl}/${id}`, {
+      headers,
       withCredentials: true
     }).pipe(
       catchError(this.handleError)
@@ -73,10 +103,19 @@ createComplaint(complaintData: Omit<Complaint, 'id'>): Observable<Complaint> {
 
   // Update complaint status
   updateComplaintStatus(id: number, status: string): Observable<Complaint> {
+    // Get the token from localStorage
+    const token = localStorage.getItem('auth_token');
+    
+    // Create headers with the token
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+    
     return this.http.patch<Complaint>(
       `${this.apiUrl}/${id}/status`, 
       { status },
-      { withCredentials: true }
+      { headers, withCredentials: true }
     ).pipe(
       catchError(this.handleError)
     );
@@ -84,21 +123,107 @@ createComplaint(complaintData: Omit<Complaint, 'id'>): Observable<Complaint> {
 
   // Upload file for a complaint
   uploadFile(complaintId: number, file: File): Observable<any> {
-    const formData = new FormData();
-    formData.append('file', file);
+    // Get the token from localStorage
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      return throwError(() => new Error('No se encontró el token de autenticación'));
+    }
     
-    return this.http.post(`${this.apiUrl}/${complaintId}/files`, formData, {
+    // Create headers with the token
+    // Note: Don't set Content-Type when using FormData, let the browser set it with the correct boundary
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json' // Explicitly accept JSON response
+    });
+    
+    // Create FormData and append the file with the correct field name
+    const formData = new FormData();
+    formData.append('file', file, file.name);
+    
+    // Log the file details for debugging
+    console.log('Uploading file:', {
+      name: file.name,
+      type: file.type,
+      size: file.size
+    });
+    
+    // Make the request to the correct endpoint
+    return this.http.post<{
+      id: number;
+      fileName: string;
+      fileType: string;
+      fileSize: number;
+      uploadedAt: string;
+    }>(`${this.apiUrl}/${complaintId}/evidence`, formData, {
+      headers,
       reportProgress: true,
       observe: 'events',
       withCredentials: true
     }).pipe(
-      catchError(this.handleError)
+      tap((event: HttpEvent<any>) => {
+        // Log upload progress
+        if (event.type === 1) { // HttpEventType.UploadProgress
+          const percentDone = Math.round(100 * event.loaded / (event.total || 1));
+          console.log(`File is ${percentDone}% uploaded`);
+        } else if (event.type === 4) { // HttpEventType.Response
+          console.log('File upload complete', event.body);
+        }
+      }),
+      map(event => {
+        // Transform the response to match the expected format
+        if (event.type === 4) { // HttpEventType.Response
+          const response = event.body as any;
+          return {
+            ...response,
+            uploadedAt: new Date(response.uploadedAt)
+          };
+        }
+        return event;
+      }),
+      catchError(error => {
+        console.error('Error uploading file:', file.name, error);
+        
+        let errorMessage = 'Error al subir el archivo';
+        
+        if (error.error) {
+          // Handle backend validation errors
+          if (typeof error.error === 'string') {
+            errorMessage = error.error;
+          } else if (error.error.message) {
+            errorMessage = error.error.message;
+          } else if (error.error.error) {
+            errorMessage = error.error.error;
+          }
+          
+          // Handle file size limit exceeded
+          if (error.status === 413 || 
+              (typeof error.error === 'string' && error.error.includes('File size exceeds'))) {
+            errorMessage = 'El archivo es demasiado grande. El tamaño máximo permitido es 5MB.';
+          }
+          
+          // Handle invalid file type
+          if (error.error.includes('File type not allowed')) {
+            errorMessage = 'Tipo de archivo no permitido. Formatos aceptados: imágenes, PDF, documentos de Word';
+          }
+        }
+        
+        return throwError(() => new Error(errorMessage));
+      })
     );
   }
 
   // Get files for a complaint
   getComplaintFiles(complaintId: number): Observable<FileMetadata[]> {
+    // Get the token from localStorage
+    const token = localStorage.getItem('auth_token');
+    
+    // Create headers with the token
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
     return this.http.get<FileMetadata[]>(`${this.apiUrl}/${complaintId}/files`, {
+      headers,
       withCredentials: true
     }).pipe(
       catchError(this.handleError)
@@ -107,7 +232,16 @@ createComplaint(complaintData: Omit<Complaint, 'id'>): Observable<Complaint> {
 
   // Download a file
   downloadFile(complaintId: number, fileId: number): Observable<Blob> {
+    // Get the token from localStorage
+    const token = localStorage.getItem('auth_token');
+    
+    // Create headers with the token
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
     return this.http.get(`${this.apiUrl}/${complaintId}/files/${fileId}`, {
+      headers,
       responseType: 'blob',
       withCredentials: true
     }).pipe(
@@ -117,11 +251,17 @@ createComplaint(complaintData: Omit<Complaint, 'id'>): Observable<Complaint> {
 
   // Format complaint data before sending to the server
   private formatComplaintData(complaintData: any): any {
-    const formatDate = (dateString: string): string | null => {
+    const formatDate = (dateString: string | null): string | null => {
       if (!dateString) return null;
       try {
         const date = new Date(dateString);
-        return isNaN(date.getTime()) ? null : date.toISOString().split('T')[0];
+        if (isNaN(date.getTime())) return null;
+        
+        // Format as yyyy-MM-dd
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
       } catch (e) {
         console.error('Error formatting date:', e);
         return null;
@@ -129,9 +269,11 @@ createComplaint(complaintData: Omit<Complaint, 'id'>): Observable<Complaint> {
     };
 
     return {
-      ...complaintData,
+      description: complaintData.description,
+      violenceType: complaintData.violenceType,
       incidentDate: formatDate(complaintData.incidentDate),
       incidentLocation: complaintData.incidentLocation || null,
+      aggressorFullName: complaintData.aggressorFullName,
       aggressorRelationship: complaintData.aggressorRelationship || null,
       aggressorAdditionalDetails: complaintData.aggressorAdditionalDetails || null
     };
