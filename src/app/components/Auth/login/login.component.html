@@ -1,60 +1,94 @@
-<div class="login-container">
-  <div class="login-box">
-    <div class="login-header">
-      <h2>Iniciar sesión</h2>
+<div class="modal-dialog modal-dialog-centered">
+  <div class="modal-content custom-modal-form">
+    <div class="d-flex justify-content-end p-3">
+      <button class="btn btn-warning px-6" (click)="navigateToRegister()">Registrar</button>
     </div>
-    
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <div class="form-group">
-        <label for="email">Correo electrónico</label>
-        <input 
-          id="email" 
-          type="email" 
-          formControlName="email"
-          class="form-control"
-          [class.is-invalid]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
-          required>
-        <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="error-message">
-          Por favor ingresa un correo electrónico válido
+
+    <div class="modal-body px-4 pb-4">
+      <div class="text-center">
+        <div class="d-inline-block rounded-circle overflow-hidden" style="width: 100px; height: 100px;">
+          <img [src]="logoPath" alt="logo" class="w-100 h-100 object-cover">
         </div>
+        <h2 class="fs-4 fw-bold mt-3">¡Bienvenido de nuevo!</h2>
+        <p class="text-muted px-3">Ingresa tus credenciales para acceder a tu cuenta.</p>
       </div>
 
-      <div class="form-group">
-        <label for="password">Contraseña</label>
-        <input 
-          id="password" 
-          type="password" 
-          formControlName="password"
-          class="form-control"
-          [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
-          required>
-        <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="error-message">
-          La contraseña es requerida
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Mensaje de error -->
+        <div *ngIf="error" class="alert alert-danger" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ error }}
         </div>
-      </div>
 
-      <div class="form-actions">
+        <!-- Email -->
+        <div class="mb-3">
+          <label for="email" class="form-label visually-hidden">Correo</label>
+          <div class="input-group custom-input-group">
+            <span class="input-group-text bg-secondary border-0"><i class="bi bi-envelope-fill"></i></span>
+            <input 
+              type="email" 
+              class="form-control border-0" 
+              id="email" 
+              formControlName="email"
+              placeholder="Correo"
+              [class.is-invalid]="hasError('email', 'required') || hasError('email', 'email')">
+          </div>
+          <div *ngIf="hasError('email', 'required')" class="invalid-feedback d-block">
+            El correo es requerido
+          </div>
+          <div *ngIf="hasError('email', 'email')" class="invalid-feedback d-block">
+            Ingresa un correo válido
+          </div>
+        </div>
+        
+        <!-- Contraseña -->
+        <div class="mb-4">
+          <label for="password" class="form-label visually-hidden">Contraseña</label>
+          <div class="input-group custom-input-group">
+            <span class="input-group-text bg-secondary border-0"><i class="bi bi-lock-fill"></i></span>
+            <input 
+              [type]="hidePassword ? 'password' : 'text'" 
+              class="form-control border-0" 
+              id="password" 
+              formControlName="password"
+              placeholder="Contraseña"
+              autocomplete="current-password"
+              [class.is-invalid]="hasError('password', 'required') || hasError('password', 'minlength')">
+            <button 
+              class="btn btn-outline-secondary border-0" 
+              type="button" 
+              (click)="hidePassword = !hidePassword"
+              [attr.aria-label]="hidePassword ? 'Mostrar contraseña' : 'Ocultar contraseña'">
+              <i class="bi" [class.bi-eye-fill]="!hidePassword" [class.bi-eye-slash-fill]="hidePassword"></i>
+            </button>
+          </div>
+          <div *ngIf="hasError('password', 'required')" class="invalid-feedback d-block">
+            La contraseña es requerida
+          </div>
+          <div *ngIf="hasError('password', 'minlength')" class="invalid-feedback d-block">
+            La contraseña debe tener al menos 6 caracteres
+          </div>
+        </div>
+
+        <!-- Botón de envío -->
         <button 
           type="submit" 
-          class="login-button"
+          class="btn btn-warning fw-medium p-2 w-100 rounded-lg"
           [disabled]="loginForm.invalid || loading">
           <span *ngIf="!loading">Iniciar sesión</span>
-          <span *ngIf="loading">Iniciando sesión...</span>
+          <div *ngIf="loading" class="spinner-border spinner-border-sm" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
         </button>
-      </div>
 
-      <div *ngIf="error" class="error-message server-error">
-        {{ error }}
-      </div>
-
-      <div class="forgot-password">
-        <a routerLink="/forgot-password" class="forgot-link">¿Olvidaste tu contraseña?</a>
-      </div>
-      
-      <div class="register-link">
-        <span>¿No tienes una cuenta? </span>
-        <a routerLink="/register" class="register-button">Registrarse</a>
-      </div>
-    </form>
+        <!-- Enlace a registro -->
+        <div class="text-center mt-3">
+          <p class="mb-0">¿No tienes una cuenta? 
+            <a href="#" (click)="$event.preventDefault(); navigateToRegister()" class="text-warning text-decoration-none">
+              Regístrate aquí
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

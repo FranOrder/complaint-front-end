@@ -15,6 +15,8 @@ export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
   loading = false;
   error: string | null = null;
+  hidePassword = true;
+  logoPath = 'assets/images/logoo.png';
 
   constructor(
     private formBuilder: FormBuilder,
@@ -23,14 +25,25 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.initializeForm();
+  }
+
+  private initializeForm(): void {
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required]
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
+  }
+
+  // Helper method to check for form control errors
+  hasError(controlName: string, errorType: string): boolean {
+    const control = this.loginForm.get(controlName);
+    return control ? control.hasError(errorType) && (control.dirty || control.touched) : false;
   }
 
   onSubmit(): void {
     if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
       return;
     }
 
@@ -44,9 +57,17 @@ export class LoginComponent implements OnInit {
         this.router.navigate(['/dashboard']);
       },
       error: (error) => {
-        this.error = 'Credenciales inválidas. Por favor, inténtalo de nuevo.';
+        this.error = error.error?.message || 'Credenciales inválidas. Por favor, inténtalo de nuevo.';
+        this.loading = false;
+      },
+      complete: () => {
         this.loading = false;
       }
     });
+  }
+
+  // Navigate to register page
+  navigateToRegister(): void {
+    this.router.navigate(['/register']);
   }
 }
