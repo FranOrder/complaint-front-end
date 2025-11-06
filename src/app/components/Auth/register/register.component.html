@@ -1,0 +1,164 @@
+<div class="modal-dialog modal-dialog-centered">
+  <div class="modal-content custom-modal-form">
+    <!-- Botón para ir al login -->
+    <div class="d-flex justify-content-end p-3">
+      <button class="btn btn-warning px-6" [routerLink]="['/login']">Iniciar Sesión</button>
+    </div>
+
+    <div class="modal-body px-4 pb-4">
+      <div class="text-center">
+        <div class="d-inline-block rounded-circle overflow-hidden">
+          <img [src]="logoPath" alt="logo" class="w-100 h-100 object-cover">
+        </div>
+        <h2 class="fs-4 fw-bold mt-3">¡Crea tu cuenta!</h2>
+        <p class="text-muted px-3">Completa el formulario para registrarte.</p>
+      </div>
+
+      <!-- Mensaje de éxito -->
+      <div *ngIf="success" class="alert alert-success" role="alert">
+        ¡Registro exitoso! Redirigiendo...
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <!-- Mensaje de error -->
+        <div *ngIf="error" class="alert alert-danger" role="alert">
+          {{ error }}
+        </div>
+
+        <div class="row g-3">
+          <!-- Nombres -->
+          <div class="col-md-6">
+            <label for="firstName" class="form-label">Nombres</label>
+            <div class="input-group custom-input-group">
+              <span class="input-group-text bg-secondary border-0"><i class="bi bi-person-fill"></i></span>
+              <input
+                type="text"
+                id="firstName"
+                formControlName="firstName"
+                placeholder="Nombres"
+                class="form-control border-0"
+                [class.is-invalid]="firstName?.invalid && (firstName?.dirty || firstName?.touched)">
+            </div>
+            <div *ngIf="firstName?.invalid && (firstName?.dirty || firstName?.touched)" class="invalid-feedback d-block">
+              <div *ngIf="firstName?.errors?.['required']">El nombre es requerido</div>
+              <div *ngIf="firstName?.errors?.['minlength']">Debe tener al menos 2 caracteres</div>
+              <div *ngIf="firstName?.errors?.['pattern']">Solo se permiten letras, espacios y guiones</div>
+            </div>
+          </div>
+
+          <!-- Apellidos -->
+          <div class="col-md-6">
+            <label for="lastName" class="form-label">Apellidos</label>
+            <div class="input-group custom-input-group">
+              <span class="input-group-text bg-secondary border-0"><i class="bi bi-person-fill"></i></span>
+              <input
+                type="text"
+                id="lastName"
+                formControlName="lastName"
+                placeholder="Apellidos"
+                class="form-control border-0"
+                [class.is-invalid]="lastName?.invalid && (lastName?.dirty || lastName?.touched)">
+            </div>
+            <div *ngIf="lastName?.invalid && (lastName?.dirty || lastName?.touched)" class="invalid-feedback d-block">
+              <div *ngIf="lastName?.errors?.['required']">Los apellidos son requeridos</div>
+              <div *ngIf="lastName?.errors?.['minlength']">Debe tener al menos 2 caracteres</div>
+              <div *ngIf="lastName?.errors?.['pattern']">Solo se permiten letras, espacios y guiones</div>
+            </div>
+          </div>
+
+          <!-- Correo -->
+          <div class="col-12">
+            <label for="email" class="form-label">Correo electrónico</label>
+            <div class="input-group custom-input-group">
+              <span class="input-group-text bg-secondary border-0"><i class="bi bi-envelope-fill"></i></span>
+              <input
+                type="email"
+                id="email"
+                formControlName="email"
+                placeholder="Correo electrónico"
+                maxlength="150"
+                class="form-control border-0"
+                [class.is-invalid]="email?.invalid && (email?.dirty || email?.touched)">
+            </div>
+            <div *ngIf="email?.invalid && (email?.dirty || email?.touched)" class="invalid-feedback d-block">
+              <div *ngIf="email?.errors?.['required']">El correo es requerido</div>
+              <div *ngIf="email?.errors?.['email']">Debe ser un correo válido</div>
+              <div *ngIf="email?.errors?.['maxlength']">No puede exceder los 150 caracteres</div>
+            </div>
+          </div>
+
+          <!-- Teléfono -->
+          <div class="col-md-6">
+            <label for="phone" class="form-label">Teléfono</label>
+            <div class="input-group custom-input-group">
+              <span class="input-group-text bg-secondary border-0"><i class="bi bi-phone-fill"></i></span>
+              <input
+                type="tel"
+                id="phone"
+                formControlName="phone"
+                placeholder="Teléfono (ej. +51987654321)"
+                class="form-control border-0"
+                [class.is-invalid]="phone?.invalid && (phone?.dirty || phone?.touched)">
+            </div>
+            <div *ngIf="phone?.invalid && (phone?.dirty || phone?.touched)" class="invalid-feedback d-block">
+              <div *ngIf="phone?.errors?.['required']">El teléfono es requerido</div>
+              <div *ngIf="phone?.errors?.['pattern']">Número no válido (9–15 dígitos)</div>
+            </div>
+          </div>
+
+          <!-- Contraseña -->
+          <div class="col-md-6">
+            <label for="password" class="form-label">Contraseña</label>
+            <div class="input-group custom-input-group">
+              <span class="input-group-text bg-secondary border-0"><i class="bi bi-lock-fill"></i></span>
+              <input
+                type="password"
+                id="password"
+                formControlName="password"
+                placeholder="Contraseña (8–50 caracteres)"
+                class="form-control border-0"
+                [class.is-invalid]="password?.invalid && (password?.dirty || password?.touched) || registerForm.hasError('mismatch')">
+            </div>
+            <div *ngIf="password?.invalid && (password?.dirty || password?.touched)" class="invalid-feedback d-block">
+              <div *ngIf="password?.errors?.['required']">La contraseña es requerida</div>
+              <div *ngIf="password?.errors?.['minlength']">Debe tener al menos 8 caracteres</div>
+              <div *ngIf="password?.errors?.['pattern']">Debe incluir mayúscula, minúscula y número</div>
+            </div>
+          </div>
+
+          <!-- Confirmar contraseña -->
+          <div class="col-md-6">
+            <label for="confirmPassword" class="form-label">Confirmar contraseña</label>
+            <div class="input-group custom-input-group">
+              <span class="input-group-text bg-secondary border-0"><i class="bi bi-lock-fill"></i></span>
+              <input
+                type="password"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                placeholder="Confirmar contraseña"
+                class="form-control border-0"
+                [class.is-invalid]="(confirmPassword?.invalid && (confirmPassword?.dirty || confirmPassword?.touched)) || registerForm.hasError('mismatch')">
+            </div>
+            <div *ngIf="confirmPassword?.errors?.['required']" class="invalid-feedback d-block">
+              La confirmación es requerida
+            </div>
+            <div *ngIf="registerForm.hasError('mismatch')" class="invalid-feedback d-block">
+              Las contraseñas no coinciden
+            </div>
+          </div>
+        </div>
+
+        <!-- Rol oculto -->
+        <input type="hidden" formControlName="role">
+
+        <!-- Botón -->
+        <button
+          type="submit"
+          class="btn btn-warning fw-medium p-2 w-100 rounded-lg mt-4"
+          [disabled]="registerForm.invalid || loading">
+          {{ loading ? 'Registrando...' : 'Registrarse' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

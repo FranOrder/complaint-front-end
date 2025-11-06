@@ -1,0 +1,86 @@
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background-image: url('../../../../assets/images/fondoa.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 5%;
+  padding-left: 2rem;
+
+}
+
+
+.modal-dialog {
+  margin: 0;
+  max-width: 600px;
+  width: 100%;
+  padding: 2rem;
+  box-shadow: 0 10px 25px rgba(27, 0, 90, 0.2);
+}
+
+.modal-content {
+  background-color: rgba(206, 235, 245, 0.95);
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+form {
+  padding: 1.5rem;
+}
+
+.form-control, .input-group-text {
+  border: none;
+  border-radius: 8px !important;
+}
+
+.input-group-text {
+  background-color: #6c757d;
+  color: white;
+}
+.rounded-circle {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); ;
+    width: 150px; 
+height: 150px; 
+  background-color: rgb(255, 255, 255) ;
+  border: 2px solid #f8f9fa;
+}
+.btn-warning {
+  font-weight: 600;
+  padding: 0.5rem 2rem;
+  border-radius: 50px;
+  transition: all 0.3s ease;
+  background-color: #a791d8;
+}
+
+.btn-warning:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+
+h2 {
+  color: #343a40;
+  margin-bottom: 0.5rem;
+}
+
+p.text-muted {
+  color: #6c757d !important;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  :host {
+    padding: 1rem;
+    justify-content: center;
+  }
+  
+  .modal-dialog {
+    max-width: 100%;
+    padding: 1rem;
+  }
+}
