@@ -3,43 +3,20 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap, catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
-
-interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  password: string;
-  role?: string;
-}
-
-export interface AuthResponse {
-  token: string;
-  type: string;
-  id: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: string;
-}
+import { LoginRequest, RegisterRequest, AuthResponse, UserInfo } from '../models/auth.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/auth`;
-  private currentUserSubject: BehaviorSubject<any>;
+  private currentUserSubject: BehaviorSubject<UserInfo | null>;
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
-  currentUser$: Observable<any>;
+  currentUser$: Observable<UserInfo | null>;
 
   constructor(private http: HttpClient, private router: Router) {
-    this.currentUserSubject = new BehaviorSubject<any>(this.getUserInfo());
+    this.currentUserSubject = new BehaviorSubject<UserInfo | null>(this.getUserInfo());
     this.currentUser$ = this.currentUserSubject.asObservable();
     
     // Check if token exists in localStorage when service initializes

@@ -228,15 +228,18 @@ export class VictimComplaintComponent implements OnInit {
     const formValues = this.complaintForm.value;
     
     // Prepare the complaint data to match the backend DTO
-    const complaintData = {
-      description: formValues.description,
-      violenceType: formValues.violenceType,
-      incidentDate: formValues.incidentDate,
-      incidentLocation: formValues.incidentLocation || null,
-      aggressorFullName: formValues.aggressorFullName,
-      aggressorRelationship: formValues.aggressorRelationship,
-      aggressorAdditionalDetails: formValues.aggressorAdditionalDetails || null
-    };
+const complaintData = {
+  ...this.complaintForm.value,
+  status: 'PENDING', // Add this line
+  // Make sure to include all other required fields
+  description: this.complaintForm.value.description,
+  violenceType: this.complaintForm.value.violenceType,
+  incidentDate: this.complaintForm.value.incidentDate,
+  incidentLocation: this.complaintForm.value.incidentLocation,
+  aggressorFullName: this.complaintForm.value.aggressorFullName,
+  aggressorRelationship: this.complaintForm.value.aggressorRelationship,
+  aggressorAdditionalDetails: this.complaintForm.value.aggressorAdditionalDetails
+};
     
     console.log('Submitting complaint data:', complaintData);
 

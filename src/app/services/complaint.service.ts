@@ -3,28 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders, HttpEvent } from '@angular/
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-
-interface Complaint {
-  id?: number;
-  description: string;
-  violenceType: string;
-  incidentDate: string | null;
-  incidentLocation?: string | null;
-  aggressorFullName: string;
-  aggressorRelationship?: string | null;
-  aggressorAdditionalDetails?: string | null;
-  status?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-interface FileMetadata {
-  id: number;
-  fileName: string;
-  fileType: string;
-  fileSize: number;
-  uploadDate: string;
-}
+import { Complaint, FileMetadata } from '../models/complaint.model';
 
 @Injectable({
   providedIn: 'root'

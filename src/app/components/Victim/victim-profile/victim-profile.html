@@ -39,33 +39,27 @@
                 </button>
               </div>
               
-              <div *ngIf="!isEditingPhone">
-                <p class="mb-0">{{ user?.phone || 'No especificado' }}</p>
-              </div>
               
-              <div *ngIf="isEditingPhone" class="mt-2">
-                <form [formGroup]="phoneForm" (ngSubmit)="onUpdatePhone()" class="d-flex gap-2">
-                  <input type="tel" 
-                         class="form-control form-control-sm" 
-                         formControlName="phone" 
-                         placeholder="Ingrese su teléfono"
-                         [class.is-invalid]="phoneForm.get('phone')?.invalid && (phoneForm.get('phone')?.dirty || phoneForm.get('phone')?.touched)">
-                  <button type="submit" 
-                          class="btn btn-sm btn-primary" 
-                          [disabled]="phoneForm.invalid || phoneForm.pristine">
-                    <i class="bi bi-check-lg"></i>
-                  </button>
-                  <button type="button" 
-                          class="btn btn-sm btn-outline-secondary" 
-                          (click)="toggleEditPhone()">
-                    <i class="bi bi-x-lg"></i>
-                  </button>
-                  <div *ngIf="phoneForm.get('phone')?.invalid && (phoneForm.get('phone')?.dirty || phoneForm.get('phone')?.touched)" class="invalid-feedback d-block">
-                    <small *ngIf="phoneForm.get('phone')?.hasError('required')">El teléfono es requerido</small>
-                    <small *ngIf="phoneForm.get('phone')?.hasError('pattern')">Ingrese un número de teléfono válido (9-15 dígitos)</small>
-                  </div>
-                </form>
-              </div>
+<div *ngIf="isEditingPhone" class="mt-2">
+  <form [formGroup]="phoneForm" (ngSubmit)="onUpdatePhone()" class="form-inline">
+    <div class="input-group">
+      <input type="tel" class="form-control" formControlName="phone" placeholder="Nuevo número de teléfono">
+      <div class="input-group-append">
+        <button type="submit" class="btn btn-primary" [disabled]="phoneForm.invalid || isLoading">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          Guardar
+        </button>
+        <button type="button" class="btn btn-outline-secondary" (click)="toggleEditPhone()" [disabled]="isLoading">
+          Cancelar
+        </button>
+      </div>
+    </div>
+    <div *ngIf="phone?.invalid && (phone?.dirty || phone?.touched)" class="text-danger small mt-1">
+      <div *ngIf="phone?.errors?.['required']">El número de teléfono es requerido</div>
+      <div *ngIf="phone?.errors?.['pattern']">Ingrese un número de teléfono válido</div>
+    </div>
+  </form>
+</div>
             </div>
           </div>
         </div>
@@ -133,9 +127,7 @@
                 <div class="card-body py-2">
                   <div class="row align-items-center">
                     <div class="col-md-8">
-                      <p class="mb-1 small text-truncate">
-                        {{ complaint.description || 'Sin descripción' }}
-                      </p>
+                  
                       <div class="d-flex flex-wrap gap-3">
                         <span class="text-muted small">
                           <i class="bi bi-calendar-event me-1"></i>
