@@ -1,0 +1,102 @@
+<div class="container mt-4">
+  <h2 class="mb-4">Centros de Ayuda</h2>
+  
+  <!-- Formulario para agregar/editar centro -->
+  <div class="card mb-4">
+    <div class="card-header">
+      {{ isEditing ? 'Editar Centro de Ayuda' : 'Agregar Nuevo Centro de Ayuda' }}
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="isEditing ? updateSupportCenter() : createSupportCenter()">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="name" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="name" 
+                   [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).name" 
+                   name="name" required>
+          </div>
+          <div class="col-md-6">
+            <label for="district" class="form-label">Distrito</label>
+            <select class="form-select" id="district" 
+                    [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).district" 
+                    name="district" required>
+              <option value="" disabled selected>Seleccionar distrito</option>
+              <option *ngFor="let district of districts" [value]="district">{{ district }}</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label for="address" class="form-label">Dirección</label>
+            <input type="text" class="form-control" id="address" 
+                   [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).address" 
+                   name="address" required>
+          </div>
+          <div class="col-md-6">
+            <label for="phone" class="form-label">Teléfono</label>
+            <input type="tel" class="form-control" id="phone" 
+                   [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).phone" 
+                   name="phone" required>
+          </div>
+          <div class="col-md-6">
+            <label for="email" class="form-label">Correo Electrónico</label>
+            <input type="email" class="form-control" id="email" 
+                   [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).email" 
+                   name="email" required>
+          </div>
+          <div class="col-12">
+            <label for="description" class="form-label">Descripción</label>
+            <textarea class="form-control" id="description" rows="3"
+                     [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).description" 
+                     name="description" required></textarea>
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary me-2">
+              {{ isEditing ? 'Actualizar' : 'Agregar' }}
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="cancelEdit()" *ngIf="isEditing">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Tabla de centros de ayuda -->
+  <div class="card">
+    <div class="card-header">
+      Lista de Centros de Ayuda
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Distrito</th>
+            <th>Dirección</th>
+            <th>Teléfono</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let center of supportCenters">
+            <td>{{ center.name }}</td>
+            <td>{{ center.district }}</td>
+            <td>{{ center.address }}</td>
+            <td>{{ center.phone }}</td>
+            <td>
+              <button class="btn btn-sm btn-warning me-2" (click)="editSupportCenter(center)">
+                <i class="bi bi-pencil"></i> Editar
+              </button>
+              <button class="btn btn-sm btn-danger" (click)="deleteSupportCenter(center.id)">
+                <i class="bi bi-trash"></i> Eliminar
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="supportCenters.length === 0">
+            <td colspan="5" class="text-center">No hay centros de ayuda registrados</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

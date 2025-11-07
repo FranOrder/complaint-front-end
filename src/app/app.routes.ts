@@ -73,6 +73,10 @@ export const routes: Routes = [
         loadComponent: () => import('./components/admin/admin-reports/admin-reports.component').then(m => m.AdminReportsComponent)
       },
       {
+        path: 'support-centers',
+        loadComponent: () => import('./components/admin/admin-supportcenter/admin-supportcenter.component').then(m => m.AdminSupportCenterComponent)
+      },
+      {
         path: '**',
         redirectTo: 'dashboard'
       }

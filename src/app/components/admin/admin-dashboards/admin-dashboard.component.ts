@@ -44,7 +44,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   showDashboard(): boolean {
-    return !['/admin/users', '/admin/complaints', '/admin/reports']
+    return !['/admin/users', '/admin/complaints', '/admin/reports','/admin/support-centers']
       .some(route => this.router.url.includes(route));
   }
 
