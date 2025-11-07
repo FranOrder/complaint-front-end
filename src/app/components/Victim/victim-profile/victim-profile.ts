@@ -11,7 +11,7 @@ import { UserService } from '../../../services/user.service';
 import { UserProfile } from '../../../models/user.model';
 
 // Models
-import { Complaint, STATUS_LABELS, VIOLENCE_TYPE_LABELS } from '../../../models/complaint.model';
+import { Complaint, STATUS_LABELS, VIOLENCE_TYPE_LABELS, RELATIONSHIP_LABELS } from '../../../models/complaint.model';
 
 @Component({
   selector: 'app-victim-profile',
@@ -81,34 +81,52 @@ private loadUserProfile(): void {
 }
 
 
-  private loadUserComplaints(): void {
-    this.isLoading = true;
-    this.complaintService.getComplaints().subscribe({
-      next: (complaints) => {
-        this.complaints = complaints.map(c => {
-          if (c.id === undefined) {
-            throw new Error('Received complaint without an ID');
-          }
-          return {
-            ...c,
-            status: c.status || 'pending', // Add default status if undefined
-            incidentLocation: c.incidentLocation || undefined,
-            isExpanded: false
-          };
-        });
-        this.isLoading = false;
+ private loadUserComplaints(): void {
+  this.isLoading = true;
+  this.complaintService.getComplaints().subscribe({
+    next: (complaints) => {
+      this.complaints = complaints.map(c => ({
+        ...c,
+        isExpanded: false
+      }));
+      this.isLoading = false;
+    },
+    error: (error) => {
+      console.error('Error loading complaints:', error);
+      this.error = 'Error al cargar las denuncias';
+      this.isLoading = false;
+    }
+  });
+}
+
+ toggleComplaintDetails(complaint: Complaint): void {
+  // Alternar el estado expandido
+  complaint.isExpanded = !complaint.isExpanded;
+
+  // Si lo acaba de expandir, cargamos los detalles desde el backend
+  if (complaint.isExpanded && complaint.id) {
+    this.complaintService.getComplaintById(complaint.id).subscribe({
+      next: (details) => {
+        // Mezclamos los datos existentes con los del backend (detallados)
+        complaint.description = details.description;
+        complaint.status = details.status;
+        complaint.violenceType = details.violenceType;
+        complaint.incidentDate = details.incidentDate;
+        complaint.createdAt = details.createdAt;
+        complaint.incidentLocation = details.incidentLocation;
+
+        // 👇 Si tu backend devuelve agresor o evidencias, las asignamos también
+        complaint.aggressor = details.aggressor;
+        complaint.evidences = details.evidences || [];
+
+        console.log('Detalles cargados para denuncia', complaint.id, details);
       },
       error: (error) => {
-        console.error('Error loading complaints:', error);
-        this.error = 'Error al cargar las denuncias';
-        this.isLoading = false;
+        console.error('Error al cargar detalles de la denuncia:', error);
       }
     });
   }
-
-  toggleComplaintDetails(complaint: Complaint): void {
-    complaint.isExpanded = !complaint.isExpanded;
-  }
+}
 
   toggleEditPhone(): void {
     if (!this.user) {
@@ -175,6 +193,10 @@ onUpdatePhone(): void {
 
   getViolenceTypeLabel(type: string | undefined): string {
     return type ? VIOLENCE_TYPE_LABELS[type] || type : 'No especificado';
+  }
+
+  getRelationshipLabel(relation: string | undefined): string {
+    return relation ? RELATIONSHIP_LABELS[relation] || relation : 'No especificado';
   }
   //#endregion
 }

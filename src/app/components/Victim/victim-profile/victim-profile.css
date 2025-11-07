@@ -1,3 +1,11 @@
+:root {
+    --primary-color: #b497bd;
+    --secondary-color: #e6daf5;
+    --sidebar-primary: #8367bf;
+    --sidebar: #ceebf5f2;
+    --white: #faf7ff;
+}
+
 /* Profile container */
 .profile-container {
   max-width: 1200px;
@@ -14,13 +22,61 @@
   margin-bottom: 20px;
 }
 
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+/* Estilos base del header */
+.card-header-complaint {
+  border-left: 5px solid transparent;
+  padding: 10px 15px;
 }
 
+/* Estados */
+.status-RECEIVED {
+  background-color: rgba(98, 177, 252, 0.966);
+  border-left-color: #0179e9ea;
+  color: #ffffff;
+}
+
+.status-IN_REVIEW {
+  background-color: rgba(255, 193, 7, 0.1); 
+  border-left-color: #ffc107;
+}
+
+.status-ACTION_TAKEN {
+  background-color: rgba(25, 135, 84, 0.1); 
+  border-left-color: #198754;
+}
+
+.status-CLOSED {
+  background-color: rgba(220, 53, 69, 0.1); 
+  border-left-color: #dc3545;
+}
+
+
+.status-RECEIVED .status-badge {
+  background-color: #edeeee;
+  color: #00aeff;
+  font-weight: bold;
+  font-size: 12px;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.1);
+}
+
+.status-IN_REVIEW .status-badge {
+  background-color: #ffc107;
+  color: black;
+}
+
+.status-ACTION_TAKEN .status-badge {
+  background-color: #198754;
+  color: white;
+}
+
+.status-CLOSED .status-badge {
+  background-color: #dc3545;
+  color: white;
+}
+
+
 .card-header {
-  background-color: #8367bf;
+  background-color: #b497bd;
   color: white;
   border-bottom: none;
   padding: 15px 20px;

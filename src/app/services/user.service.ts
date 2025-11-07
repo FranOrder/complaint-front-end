@@ -26,8 +26,8 @@ export class UserService {
     );
   }
 updateProfile(userId: number, data: UpdateProfileRequest): Observable<UserProfile> {
-  return this.http.put<UserProfile>(   // 👈 usa PUT en lugar de PATCH
-    `${this.apiUrl}/${userId}`,        // 👈 elimina "/profile"
+  return this.http.put<UserProfile>( 
+    `${this.apiUrl}/${userId}`,        
     data,
     { headers: this.getAuthHeaders() }
   );

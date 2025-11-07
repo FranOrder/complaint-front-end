@@ -36,11 +36,12 @@ export interface Complaint {
 }
 
 export const STATUS_LABELS: {[key: string]: string} = {
-  'PENDING': 'Pendiente',
-  'UNDER_REVIEW': 'En revisión',
-  'ACTION_TAKEN': 'En proceso',
-  'CLOSED': 'Cerrado',
-  'REJECTED': 'Rechazado'
+
+        'RECEIVED': 'Recibido',
+        'IN_REVIEW': 'En revisión',
+        'ACTION_TAKEN': 'En proceso',
+        'CLOSED': 'Cerrado',
+   
 };
 
 export const VIOLENCE_TYPE_LABELS: {[key: string]: string} = {
@@ -52,3 +53,14 @@ export const VIOLENCE_TYPE_LABELS: {[key: string]: string} = {
   'DIGITAL': 'Digital',
   'OTHER': 'Otra'
 };
+export const RELATIONSHIP_LABELS: {[key: string]: string} = {
+    
+        'FRIEND': 'Amigo',
+        'FAMILY': 'Familiar',
+        'NEIGHBOUR': 'Vecino',
+        'EX_PARTNER': 'Ex pareja',
+        'PARTNER': 'Pareja actual',
+        'STRANGE': 'Desconocido',
+        'OTHER': 'Otro'
+    }
+

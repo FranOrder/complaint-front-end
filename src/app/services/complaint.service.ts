@@ -44,42 +44,49 @@ export class ComplaintService {
       );
   }
 
-  // Get all complaints for the current user
   getComplaints(): Observable<Complaint[]> {
-    // Get the token from localStorage
-    const token = localStorage.getItem('auth_token');
-    
-    // Create headers with the token
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-    
-    return this.http.get<Complaint[]>(`${this.apiUrl}/my-complaints`, {
-      headers,
-      withCredentials: true
-    }).pipe(
+  const token = localStorage.getItem('auth_token');
+
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+  
+
+  return this.http.get<Complaint[]>(`${this.apiUrl}/my-complaints`, {
+    headers,
+    withCredentials: true
+  }).pipe(
+    map((complaints) =>
+      complaints.map((c) => ({
+        ...c,
+        // 🔧 Crear el objeto aggressor directamente aquí
+        aggressor: {
+          fullName: c.aggressorFullName || 'No registrado',
+          relationship: c.aggressorRelationship || 'No especificada',
+          additionalDetails: c.aggressorAdditionalDetails || 'Sin detalles'
+        },
+      }))
+    ),
+    catchError(this.handleError)
+  );
+}
+
+ getComplaintById(id: number): Observable<Complaint> {
+  const token = localStorage.getItem('auth_token');
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
+
+  return this.http.get<Complaint>(`${this.apiUrl}/${id}`, { headers, withCredentials: true })
+    .pipe(
+      tap(response => console.log('Detalles completos de la denuncia:', response)),
       catchError(this.handleError)
     );
-  }
-
-  // Get a single complaint by ID
-  getComplaintById(id: number): Observable<Complaint> {
-    // Get the token from localStorage
-    const token = localStorage.getItem('auth_token');
-    
-    // Create headers with the token
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-    
-    return this.http.get<Complaint>(`${this.apiUrl}/${id}`, {
-      headers,
-      withCredentials: true
-    }).pipe(
-      catchError(this.handleError)
-    );
-  }
-
+}
+// In complaint.service.ts
+getEvidenceUrl(fileName: string): string {
+  return `${environment.apiUrl}/files/${fileName}`;
+}
   // Update complaint status
   updateComplaintStatus(id: number, status: string): Observable<Complaint> {
     // Get the token from localStorage
