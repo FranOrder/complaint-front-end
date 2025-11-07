@@ -53,7 +53,30 @@ export const routes: Routes = [
     path: 'admin',
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'ADMIN' },
-    loadComponent: () => import('./components/admin-users/admin-dashboards/admin-dashboard.component').then(m => m.AdminDashboardComponent)
+    loadComponent: () => import('./components/admin/admin-dashboards/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./components/admin/admin-users/admin-users.component').then(m => m.AdminUsersComponent)
+      },
+      {
+        path: 'complaints',
+        loadComponent: () => import('./components/admin/admin-complaints/admin-complaints.component').then(m => m.AdminComplaintsComponent)
+      },
+      {
+        path: 'reports',
+        loadComponent: () => import('./components/admin/admin-reports/admin-reports.component').then(m => m.AdminReportsComponent)
+      },
+      {
+        path: '**',
+        redirectTo: 'dashboard'
+      }
+    ]
   },
   {
     path: '**',

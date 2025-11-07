@@ -53,8 +53,13 @@ export class LoginComponent implements OnInit {
     const { email, password } = this.loginForm.value;
     
     this.authService.login({ email, password }).subscribe({
-      next: () => {
-        this.router.navigate(['/victim/home']);
+      next: (response) => {
+        const user = this.authService.getUserInfo();
+        if (user && user.role === 'ADMIN') {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/victim/home']);
+        }
       },
       error: (error) => {
         this.error = error.error?.message || 'Credenciales inválidas. Por favor, inténtalo de nuevo.';
