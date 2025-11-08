@@ -6,13 +6,11 @@ export interface SupportCenter {
   phone: string;
   email: string;
   schedule: string;
-  isActive?: boolean;  // Keep this for form handling
-  active?: boolean;    // Add this to match the API response
+  isActive: boolean;  // Standardized to isActive
   createdBy?: string;
   createdAt?: string;
   updatedAt?: string;
 }
-
 export interface SupportCenterResponse {
   id: number;
   name: string;
@@ -21,8 +19,61 @@ export interface SupportCenterResponse {
   phone: string;
   email: string;
   schedule: string;
-  isActive: boolean;
+
+  // 🔹 Acepta ambos nombres posibles (para compatibilidad)
+  active?: boolean;
+  isActive?: boolean;
+
   createdBy?: string;
   createdAt: string;
   updatedAt: string;
 }
+
+export const DISTRICTS = [
+  // Lima Centro
+  { label: 'Lima Cercado', value: 'LIMA' },
+  { label: 'Breña', value: 'BREÑA' },
+  { label: 'La Victoria', value: 'LA_VICTORIA' },
+  { label: 'Rímac', value: 'RIMAC' },
+
+  // Lima Norte
+  { label: 'Carabayllo', value: 'CARABAYLLO' },
+  { label: 'Comas', value: 'COMAS' },
+  { label: 'Independencia', value: 'INDEPENDENCIA' },
+  { label: 'Los Olivos', value: 'LOS_OLIVOS' },
+  { label: 'Puente Piedra', value: 'PUENTE_PIEDRA' },
+  { label: 'San Martín de Porres', value: 'SAN_MARTIN_DE_PORRES' },
+
+  // Lima Este
+  { label: 'Ate', value: 'ATE' },
+  { label: 'Cieneguilla', value: 'CIENEGUILLA' },
+  { label: 'El Agustino', value: 'EL_AGUSTINO' },
+  { label: 'San Juan de Lurigancho', value: 'SAN_JUAN_DE_LURIGANCHO' },
+  { label: 'San Luis', value: 'SAN_LUIS' },
+  { label: 'Santa Anita', value: 'SANTA_ANITA' },
+
+  // Lima Sur
+  { label: 'Barranco', value: 'BARRANCO' },
+  { label: 'Chorrillos', value: 'CHORRILLOS' },
+  { label: 'Pachacámac', value: 'PACHACAMAC' },
+  { label: 'Punta Hermosa', value: 'PUNTA_HERMOSA' },
+  { label: 'Punta Negra', value: 'PUNTA_NEGRA' },
+  { label: 'San Juan de Miraflores', value: 'SAN_JUAN_DE_MIRAFLORES' },
+  { label: 'Villa El Salvador', value: 'VILLA_EL_SALVADOR' },
+  { label: 'Villa María del Triunfo', value: 'VILLA_MARIA_DEL_TRIUNFO' },
+
+  // Lima Moderna
+  { label: 'Jesús María', value: 'JESUS_MARIA' },
+  { label: 'Lince', value: 'LINCE' },
+  { label: 'Magdalena del Mar', value: 'MAGDALENA_DEL_MAR' },
+  { label: 'Miraflores', value: 'MIRAFLORES' },
+  { label: 'Pueblo Libre', value: 'PUEBLO_LIBRE' },
+  { label: 'San Borja', value: 'SAN_BORJA' },
+  { label: 'San Isidro', value: 'SAN_ISIDRO' },
+  { label: 'San Miguel', value: 'SAN_MIGUEL' },
+  { label: 'Santiago de Surco', value: 'SANTIAGO_DE_SURCO' },
+  { label: 'Surquillo', value: 'SURQUILLO' },
+
+  // Callao
+  { label: 'Callao', value: 'CALLAO' }
+] as const;

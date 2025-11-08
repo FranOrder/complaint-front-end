@@ -1,195 +1,239 @@
-<div class="container mt-4">
-  <h2 class="mb-4">Centros de Ayuda</h2>
-  
-  <!-- Mensajes de éxito y error -->
-  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
-    {{ successMessage }}
-    <button type="button" class="btn-close" (click)="successMessage = ''" aria-label="Cerrar"></button>
-  </div>
-  
-  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
-    {{ errorMessage }}
-    <button type="button" class="btn-close" (click)="errorMessage = ''" aria-label="Cerrar"></button>
-  </div>
-  
-  <!-- Formulario para agregar/editar centro -->
-  <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">Centros de Ayuda</h5>
-      <button class="btn btn-success me-2" (click)="onAddNew()">
-      <i class="bi bi-plus-circle"></i> Agregar Nuevo
-    </button>
-    <button class="btn btn-primary me-2" [disabled]="!selectedSupportCenter" (click)="editSupportCenter(selectedSupportCenter!)">
-      <i class="bi bi-pencil"></i> Editar
-    </button>
-    <button class="btn btn-danger" [disabled]="!selectedSupportCenter" (click)="deleteSupportCenter(selectedSupportCenter!.id!)">
-      <i class="bi bi-trash"></i> Eliminar
-    </button>
-    </div>
-    <div class="card-body">
-     <div class="row mb-3">
-  <div class="col-md-4">
-    <div class="input-group">
-      <input type="text" class="form-control" placeholder="Buscar por nombre o email" 
-             [(ngModel)]="searchTerm">
-    </div>
-  </div>
-  <div class="col-md-3">
-    <select class="form-select" [(ngModel)]="selectedDistrictFilter">
-  <option value="">Todos los distritos</option>
-  <option *ngFor="let district of getDistricts()" [value]="district">
-    {{ district }}
-  </option>
-</select>
-  </div>
-  <div class="col-md-3">
-    <select class="form-select" [(ngModel)]="activeStatusFilter">
-      <option [ngValue]="''">Todos los estados</option>
-      <option [ngValue]="true">Activos</option>
-      <option [ngValue]="false">Inactivos</option>
-    </select>
-  </div>
-  <div class="col-md-2">
-    <button class="btn btn-primary me-2" (click)="onFilterClick()">
-      <i class="bi bi-funnel"></i> Filtrar
-    </button>
-    <button class="btn btn-outline-secondary" (click)="clearFilters()">
-      <i class="bi bi-x-circle"></i>
-    </button>
-  </div>
-</div>
-      <form (ngSubmit)="isEditing ? updateSupportCenter() : createSupportCenter()" #supportCenterForm="ngForm">
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label for="name" class="form-label">Nombre <span class="text-danger">*</span></label>
-            <input type="text" class="form-control" id="name" 
-                   [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).name" 
-                   name="name" required>
-          </div>
-          <div class="col-md-6">
-             <label for="district" class="form-label">Distrito</label>
-  <select class="form-select" id="district" name="district" 
-          [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).district" required>
-    <option value="">Seleccione un distrito</option>
-    <option *ngFor="let district of DISTRICTS" [value]="district">
-      {{ district }}
-    </option>
-  </select>
-          </div>
-          <div class="col-12">
-            <div class="mb-3">
-              <label for="street" class="form-label">Calle</label>
-              <input type="text" class="form-control" id="street" name="street" [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).street" required>
+<div class="container-fluid py-4">
+  <!-- Modal del formulario -->
+  <div class="modal-overlay" *ngIf="isFormVisible">
+    <div class="modal-container card shadow-lg">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ isEditing ? 'Editar' : 'Nuevo' }} Centro de Ayuda</h5>
+        <button type="button" class="btn-close" aria-label="Cerrar" (click)="cancelEdit()"></button>
+      </div>
+
+      <div class="card-body">
+        <form (ngSubmit)="saveSupportCenter()" #supportCenterForm="ngForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="name" class="form-label">Nombre <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="name"
+                     [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).name"
+                     name="name" required>
+            </div>
+
+            <div class="col-md-6">
+              <label for="district" class="form-label">Distrito <span class="text-danger">*</span></label>
+              <select id="district"
+                      [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).district"
+                      name="district"
+                      class="form-select"
+                      required>
+                <option [ngValue]="null" disabled>Seleccione un distrito</option>
+                <option *ngFor="let district of getDistricts()" [ngValue]="district.value">
+                  {{ district.label }}
+                </option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label for="street" class="form-label">Dirección <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="street"
+                     [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).street"
+                     name="street" required>
+            </div>
+
+            <div class="col-md-6">
+              <label for="phone" class="form-label">Teléfono <span class="text-danger">*</span></label>
+              <input type="tel" class="form-control" id="phone"
+                     [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).phone"
+                     name="phone" required>
+            </div>
+
+            <div class="col-md-6">
+              <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+              <input type="email" class="form-control" id="email"
+                     [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).email"
+                     name="email" required>
+            </div>
+
+            <div class="col-12">
+              <label for="schedule" class="form-label">Horario <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="schedule"
+                     [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).schedule"
+                     name="schedule" required>
+            </div>
+
+            <div class="col-12">
+              <div class="form-check form-switch">
+                <input class="form-check-input"
+                       type="checkbox"
+                       id="isActive"
+                       [checked]="isEditing ? (selectedSupportCenter?.isActive ?? true) : (newSupportCenter.isActive ?? true)"
+                       (change)="onActiveStatusChange($event)">
+                <label class="form-check-label" for="isActive">
+                  {{ isEditing ? (selectedSupportCenter?.isActive ? 'Activo' : 'Inactivo') : (newSupportCenter.isActive ? 'Activo' : 'Inactivo') }}
+                </label>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="d-flex justify-content-end gap-2 mt-3">
+                <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancelar</button>
+                <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+                  {{ isEditing ? 'Actualizar' : 'Guardar' }}
+                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
+                </button>
+              </div>
             </div>
           </div>
-          <div class="col-md-6">
-            <label for="phone" class="form-label">Teléfono <span class="text-danger">*</span></label>
-            <input type="tel" class="form-control" id="phone" 
-                   [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).phone" 
-                   name="phone" required>
-          </div>
-          <div class="col-md-6">
-            <label for="email" class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
-            <input type="email" class="form-control" id="email" 
-                   [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).email" 
-                   name="email" required>
-          </div>
-          <div class="col-12">
-            <div class="mb-3">
-              <label for="schedule" class="form-label">Horario</label>
-              <input type="text" class="form-control" id="schedule" name="schedule" [(ngModel)]="(isEditing ? selectedSupportCenter : newSupportCenter).schedule" required>
-              <div class="form-text">Ejemplo: Lunes a Viernes 9:00 AM - 6:00 PM</div>
-            </div>
- <div class="form-check form-switch mb-3">
-  <input 
-    class="form-check-input" 
-    type="checkbox" 
-    id="isActive" 
-    [checked]="(isEditing ? selectedSupportCenter?.isActive ?? selectedSupportCenter?.active : newSupportCenter.isActive) ?? true"
-    (change)="onActiveStatusChange($event)">
-  <label class="form-check-label" for="isActive">Activo</label>
-</div>
-          </div>
-          <div class="col-12 mt-3">
-            <button type="submit" class="btn btn-primary me-2" [disabled]="isLoading">
-              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
-              {{ isEditing ? (isLoading ? 'Actualizando...' : 'Actualizar') : (isLoading ? 'Agregando...' : 'Agregar') }}
-            </button>
-            <button *ngIf="!isEditing" type="reset" class="btn btn-outline-secondary" [disabled]="isLoading">
-              Limpiar
-            </button>
-          </div>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   </div>
 
-  <!-- Tabla de centros de ayuda -->
+  <!-- Tabla principal -->
   <div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-      <h5 class="mb-0">Lista de Centros de Ayuda</h5>
-      <button class="btn btn-sm btn-outline-primary" (click)="loadSupportCenters()" [disabled]="isLoading">
-        <i class="bi" [ngClass]="{'bi-arrow-repeat': !isLoading, 'spinner-border spinner-border-sm': isLoading}"></i>
-        {{ isLoading ? 'Cargando...' : 'Actualizar' }}
-      </button>
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+      <h5 class="mb-0">Centros de Ayuda</h5>
+
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <!-- Leyenda de estado -->
+        <div class="status-legend">
+          <span class="legend-item">
+            <i class="bi bi-circle-fill text-success"></i>
+            <small><em>Activo</em></small>
+          </span>
+          <span class="legend-item">
+            <i class="bi bi-circle-fill text-danger"></i>
+            <small><em>Inactivo</em></small>
+          </span>
+        </div>
+
+        <!-- Botones -->
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-success" (click)="onAddNew()" [disabled]="isFormVisible && !isEditing">
+            <i class="bi bi-plus-circle"></i> Agregar Nuevo
+          </button>
+          <button class="btn btn-primary"
+                  [disabled]="!selectedSupportCenter || (isFormVisible && isEditing)"
+                  (click)="editSupportCenter(selectedSupportCenter!)">
+            <i class="bi bi-pencil"></i> Editar
+          </button>
+          <button class="btn btn-danger"
+                  [disabled]="!selectedSupportCenter"
+                  (click)="deleteSupportCenter(selectedSupportCenter!.id!)">
+            <i class="bi bi-trash"></i> Inactivar
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="table-responsive">
-      <table class="table table-hover">
-        <thead class="table-light">
-          <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Calle</th>
-            <th>Distrito</th>
-            <th>Teléfono</th>
-            <th>Email</th>
-            <th>Horario</th>
-            
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngIf="isLoading && supportCenters.length === 0">
-            <td colspan="5" class="text-center py-4">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Cargando...</span>
-              </div>
-              <p class="mt-2 mb-0">Cargando centros de ayuda...</p>
-            </td>
-          </tr>
-<tr *ngFor="let center of filteredSupportCenters; trackBy: trackById" 
-    [class.table-active]="isSelected(center.id)"
-    (click)="selectSupportCenter(center)"
-    style="cursor: pointer;">
-  <td [class.border-4]="true" 
-      [class.border-success]="center.active || center.isActive" 
-      [class.border-danger]="!(center.active || center.isActive)">
-    {{ center.id }}
-  </td>
-            <td class="align-middle">
-              <strong>{{ center.name }}</strong>
-              <div *ngIf="center.email" class="text-muted small">{{ center.email }}</div>
-            </td>
-            <td class="align-middle">{{ center.street }}</td>
-            <td class="align-middle">
-              <span class="badge bg-primary">{{ center.district }}</span>
-            </td>
-            <td class="align-middle">
-              <a href="tel:{{center.phone}}" class="text-decoration-none">
-                <i class="bi bi-telephone-fill text-primary me-1"></i> {{ center.phone }}
-              </a>
-            </td>
-            <td class="align-middle">{{ center.email }}</td>
-            <td class="align-middle">{{ center.schedule }}</td>
-        
-          </tr>
-          <tr *ngIf="!isLoading && supportCenters.length === 0">
-            <td colspan="5" class="text-center py-4 text-muted">
-              <i class="bi bi-inbox display-5 d-block mb-2"></i>
-              No hay centros de ayuda registrados
-            </td>
-          </tr>
-        </tbody>
-      </table>
+
+    <div class="card-body">
+      <!-- Filtros -->
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" class="form-control" placeholder="Buscar por nombre o email..."
+                  [(ngModel)]="searchTerm" (keyup.enter)="onFilterClick()">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" [(ngModel)]="selectedDistrictFilter">
+            <option value="">Todos los distritos</option>
+            <option *ngFor="let district of getDistricts()" [value]="district.label">
+              {{ district.label }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" [(ngModel)]="activeStatusFilter">
+            <option [ngValue]="''">Todos los estados</option>
+            <option [ngValue]="true">Activos</option>
+            <option [ngValue]="false">Inactivos</option>
+          </select>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+          <button class="btn btn-primary" (click)="onFilterClick()">
+            <i class="bi bi-funnel"></i> Filtrar
+          </button>
+          <button class="btn btn-outline-secondary" (click)="clearFilters()" title="Limpiar filtros">
+            <i class="bi bi-x-circle"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="table-container">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Distrito</th>
+              <th>Dirección</th>
+              <th>Teléfono</th>
+              <th>Email</th>
+              <th>Horario</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="isLoading">
+              <td colspan="8" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status"></div>
+              </td>
+            </tr>
+            <tr *ngFor="let center of filteredSupportCenters; trackBy: trackById"
+                [class.table-active]="isSelected(center.id)"
+                (click)="selectSupportCenter(center)"
+                style="cursor: pointer;">
+              <td [class.border-4]="true"
+                  [class.border-success]="center.isActive"
+                  [class.border-danger]="!center.isActive">
+                {{ center.id }}
+              </td>
+              <td>{{ center.name }}</td>
+              <td>{{ getDistrictDisplayName(center.district) }}</td>
+              <td>{{ center.street }}</td>
+              <td>{{ center.phone }}</td>
+              <td>{{ center.email }}</td>
+              <td>{{ center.schedule }}</td>
+            </tr>
+            <tr *ngIf="!isLoading && filteredSupportCenters.length === 0">
+              <td colspan="8" class="text-center py-4 text-muted">
+                No se encontraron centros de ayuda
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toasts -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 2000">
+  <!-- Éxito -->
+  <div
+    *ngIf="successMessage"
+    class="toast align-items-center text-bg-success border-0 show fade-in"
+    role="alert"
+  >
+    <div class="d-flex">
+      <div class="toast-body">
+        <i class="bi bi-check-circle me-2"></i> {{ successMessage }}
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="successMessage=''"></button>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div
+    *ngIf="errorMessage"
+    class="toast align-items-center text-bg-danger border-0 show fade-in"
+    role="alert"
+  >
+    <div class="d-flex">
+      <div class="toast-body">
+        <i class="bi bi-exclamation-triangle me-2"></i> {{ errorMessage }}
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="errorMessage=''"></button>
     </div>
   </div>
 </div>

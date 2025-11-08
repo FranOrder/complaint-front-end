@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 
 // Models
-import { SupportCenter, SupportCenterResponse } from '../../../models/support-center.model';
+import { SupportCenter, SupportCenterResponse, DISTRICTS } from '../../../models/support-center.model';
 
 // Services
 import { SupportCenterService } from '../../../services/support-center.service';
@@ -25,6 +25,7 @@ export class AdminSupportCenterComponent implements OnInit, OnDestroy {
   selectedSupportCenter: SupportCenter | null = null;
   isEditing = false;
   isLoading = false;
+  isFormVisible = false;
   
 selectedSupportCenterId: number | null = null;
   
@@ -41,20 +42,17 @@ selectedSupportCenterId: number | null = null;
   successMessage = '';
 
   // Constants
-readonly DISTRICTS = [
-  'Lima', 'Ate', 'Barranco', 'Breña', 'Comas', 
-  'La Molina', 'La Victoria', 'Lince', 'Magdalena',
-  'Miraflores', 'Pueblo Libre', 'San Borja', 'San Isidro',
-  'San Juan de Lurigancho', 'San Miguel', 'Santiago de Surco',
-  'Surquillo', 'Villa El Salvador', 'Villa María del Triunfo'
-] as const;
+ readonly DISTRICTS = DISTRICTS;
 
 private districtMap = new Map<string, string>();
-  constructor(private supportCenterService: SupportCenterService) {
-  // Map display names to API values and vice versa
+
+constructor(private supportCenterService: SupportCenterService) {
+  // Mapea valores del API ↔ nombres legibles
   this.DISTRICTS.forEach(district => {
-    const apiValue = district.toUpperCase().replace(/ /g, '_');
-    this.districtMap.set(apiValue, district);
+    // API usa district.value (ej. "SAN_JUAN_DE_LURIGANCHO")
+    // Interfaz muestra district.label (ej. "San Juan de Lurigancho")
+    this.districtMap.set(district.value, district.label);
+    this.districtMap.set(district.label, district.value); // bidireccional, opcional
   });
 }
 
@@ -71,34 +69,75 @@ private districtMap = new Map<string, string>();
   getDistrictDisplayName(apiValue: string): string {
   return this.districtMap.get(apiValue) || apiValue;
 }
+private mapSupportCenter(center: any): SupportCenterResponse {
+  return {
+    ...center,
+    isActive: center.active ?? center.isActive ?? true
+  };
+}
 
+getDistrictValue(displayName: string): string {
+  // Convert display name to API format (e.g., "San Juan de Lurigancho" -> "SAN_JUAN_DE_LURIGANCHO")
+  return displayName.toUpperCase().replace(/ /g, '_');
+}
+
+// When saving/updating a support center
+private prepareSupportCenterData(supportCenter: Partial<SupportCenter>): any {
+  const data = {
+    ...supportCenter,
+    district: this.getDistrictValue(supportCenter.district || ''),
+    active: supportCenter.isActive ?? true // 👈 Aquí el cambio importante
+  };
+
+  // Quitamos isActive para no duplicar
+  delete (data as any).isActive;
+
+  // Removemos undefined
+  return Object.fromEntries(
+    Object.entries(data).filter(([_, v]) => v !== undefined)
+  );
+}
+
+onActiveStatusChange(event: Event): void {
+  const isChecked = (event.target as HTMLInputElement).checked;
+  if (this.isEditing && this.selectedSupportCenter) {
+    // Create a new object to trigger change detection
+    this.selectedSupportCenter = {
+      ...this.selectedSupportCenter,
+      isActive: isChecked
+    };
+  } else {
+    this.newSupportCenter = {
+      ...this.newSupportCenter,
+      isActive: isChecked
+    };
+  }
+}
   // Data loading
- private loadSupportCenters(): void {
+private loadSupportCenters(): void {
   this.isLoading = true;
   this.errorMessage = '';
-  
+
   this.supportCenterService.getAllSupportCenters()
     .pipe(takeUntil(this.destroy$))
     .subscribe({
       next: (data) => {
-        console.log('Loaded support centers:', data); // Debug log
-        this.supportCenters = data;
-        this.applyFilters();
+        this.supportCenters = data.map(center => this.mapSupportCenter(center));
+        this.filteredSupportCenters = [...this.supportCenters];
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading support centers:', error);
         this.handleError(error, 'Error al cargar los centros de ayuda');
         this.isLoading = false;
       }
     });
 }
 onAddNew(): void {
+  this.isFormVisible = true;
+  this.isEditing = false;
   this.selectedSupportCenter = null;
   this.selectedSupportCenterId = null;
-  this.isEditing = false;
   this.newSupportCenter = this.getDefaultSupportCenter();
-  this.openModal('supportCenterModal');
 }
 
 selectSupportCenter(center: SupportCenter): void {
@@ -111,55 +150,55 @@ isSelected(id?: number): boolean {
 }
 
   // CRUD Operations
-  createSupportCenter(): void {
-    if (!this.validateForm(this.newSupportCenter)) {
-      return;
-    }
-    
-    this.isLoading = true;
-    this.errorMessage = '';
-    
-    const supportCenterData = {
-      ...this.newSupportCenter,
-      isActive: this.newSupportCenter.isActive ?? true
-    };
-
-    this.supportCenterService.createSupportCenter(supportCenterData)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: () => {
-          this.loadSupportCenters();
-          this.showSuccess('Centro de ayuda creado correctamente');
-          this.closeModal('supportCenterModal');
-          this.resetForm();
-        },
-        error: (error) => this.handleError(error, 'Error al crear el centro de ayuda')
-      });
-  }
-
-  updateSupportCenter(): void {
-    if (!this.selectedSupportCenter?.id || !this.validateForm(this.selectedSupportCenter)) {
-      return;
-    }
-    
-    this.isLoading = true;
-    this.errorMessage = '';
-    
-    this.supportCenterService.updateSupportCenter(
-      this.selectedSupportCenter.id,
-      this.selectedSupportCenter
-    )
+ private createSupportCenter(): void {
+  const supportCenterData = {
+    ...this.prepareSupportCenterData(this.newSupportCenter),
+    isActive: this.newSupportCenter.isActive ?? true
+  };
+  
+  this.supportCenterService.createSupportCenter(supportCenterData)
     .pipe(takeUntil(this.destroy$))
     .subscribe({
-      next: () => {
-        this.loadSupportCenters();
-        this.showSuccess('Centro de ayuda actualizado correctamente');
-        this.closeModal('supportCenterModal');
-        this.resetForm();
-      },
+      next: () => this.handleSaveSuccess('Centro de ayuda creado correctamente'),
+      error: (error) => this.handleError(error, 'Error al crear el centro de ayuda')
+    });
+}
+saveSupportCenter(): void {
+  // 🔹 Determinar qué centro se está editando o creando
+  const center: Partial<SupportCenter> =
+    this.isEditing && this.selectedSupportCenter
+      ? this.selectedSupportCenter
+      : this.newSupportCenter;
+
+  // 🔹 Validar antes de enviar
+  if (!this.validateForm(center)) {
+    this.showError(this.errorMessage); // Muestra el mensaje temporalmente
+    return;
+  }
+
+  // 🔹 Crear o actualizar según corresponda
+  if (this.isEditing && this.selectedSupportCenter) {
+    this.updateSupportCenter();
+  } else {
+    this.createSupportCenter();
+  }
+}
+
+  private updateSupportCenter(): void {
+  if (!this.selectedSupportCenter?.id) return;
+  
+  const supportCenterData = {
+    ...this.prepareSupportCenterData(this.selectedSupportCenter),
+    isActive: this.selectedSupportCenter.isActive ?? true
+  };
+  
+  this.supportCenterService.updateSupportCenter(this.selectedSupportCenter.id, supportCenterData)
+    .pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: () => this.handleSaveSuccess('Centro de ayuda actualizado correctamente'),
       error: (error) => this.handleError(error, 'Error al actualizar el centro de ayuda')
     });
-  }
+}
 
   deleteSupportCenter(id: number): void {
   if (!confirm('¿Está seguro de eliminar este centro de ayuda? Esta acción no se puede deshacer.')) {
@@ -184,32 +223,24 @@ isSelected(id?: number): boolean {
 
   // UI Helpers
 editSupportCenter(center: SupportCenter): void {
-  this.selectedSupportCenter = { ...center };
+  this.isFormVisible = true;
   this.isEditing = true;
-  this.openModal('supportCenterModal');
+  this.selectedSupportCenter = { ...center };
+  this.selectedSupportCenterId = center.id || null;
 }
   
-  cancelEdit(): void {
-    this.resetForm();
-    this.errorMessage = '';
-  }
+cancelEdit(): void {
+  this.isFormVisible = false;
+  this.resetForm();
+}
 
   // Form Helpers
-  private openModal(modalId: string): void {
-    const modalElement = document.getElementById(modalId);
-    if (modalElement) {
-      const modal = new (window as any).bootstrap.Modal(modalElement);
-      modal.show();
-    }
-  }
-  
-  private closeModal(modalId: string): void {
-    const modalElement = document.getElementById(modalId);
-    if (modalElement) {
-      const modal = (window as any).bootstrap.Modal.getInstance(modalElement);
-      if (modal) modal.hide();
-    }
-  }
+private handleSaveSuccess(message: string): void {
+  this.showSuccess(message);
+  this.isFormVisible = false;
+  this.loadSupportCenters();
+  this.resetForm();
+}
   
   private resetForm(): void {
     this.newSupportCenter = this.getDefaultSupportCenter();
@@ -279,54 +310,34 @@ editSupportCenter(center: SupportCenter): void {
 applyFilters(): void {
   if (!this.supportCenters) return;
 
-  this.filteredSupportCenters = this.supportCenters.filter((center: SupportCenter & { active?: boolean }) => {
-    // Search by name or email (case insensitive)
+  this.filteredSupportCenters = this.supportCenters.filter((center) => {
+    // 🔎 Búsqueda por nombre o email (insensible a mayúsculas)
     const searchTerm = this.searchTerm?.toLowerCase() || '';
-    const matchesSearch = !this.searchTerm || 
-      (center.name?.toLowerCase().includes(searchTerm) || 
-       center.email?.toLowerCase().includes(searchTerm));
+    const matchesSearch =
+      !this.searchTerm ||
+      center.name?.toLowerCase().includes(searchTerm) ||
+      center.email?.toLowerCase().includes(searchTerm);
 
-    // District filter
+    // 🏙️ Filtro de distrito
     const displayDistrict = this.districtMap.get(center.district) || center.district;
-    const matchesDistrict = !this.selectedDistrictFilter || 
-      displayDistrict === this.selectedDistrictFilter;
+    const matchesDistrict =
+      !this.selectedDistrictFilter || displayDistrict === this.selectedDistrictFilter;
 
-    // Status filter - check both 'active' and 'isActive' properties
-    const isActive = 'active' in center ? center.active : center.isActive;
-    const matchesStatus = this.activeStatusFilter === '' || 
-      isActive === this.activeStatusFilter;
+    // ✅ Filtro de estado (usa 'active' o 'isActive' según exista)
+    const isActive = center.active ?? center.isActive;
+    const matchesStatus =
+      this.activeStatusFilter === '' || isActive === this.activeStatusFilter;
 
     return matchesSearch && matchesDistrict && matchesStatus;
   });
 }
+
   
 onFilterClick(): void {
   this.applyFilters();
 }
 
-  private matchesSearch(center: SupportCenter): boolean {
-    if (!this.searchTerm) return true;
-    const search = this.searchTerm.toLowerCase();
-    return (
-      center.name.toLowerCase().includes(search) ||
-      (center.email?.toLowerCase().includes(search) ?? false)
-    );
-  }
   
-  private matchesDistrict(center: any): boolean {
-  if (!this.selectedDistrictFilter) return true;
-  
-  // Convert both to the same format for comparison
-  const displayDistrict = this.districtMap.get(center.district) || center.district;
-  return displayDistrict === this.selectedDistrictFilter;
-}
-  
-private matchesStatus(center: any): boolean {
-  if (this.activeStatusFilter === '') return true;
-  // Check both 'active' and 'isActive' properties
-  const isActive = center.active !== undefined ? center.active : center.isActive;
-  return isActive === this.activeStatusFilter;
-}
   // Error handling
   private handleError(error: any, defaultMessage: string): void {
     console.error(error);
@@ -341,15 +352,19 @@ private matchesStatus(center: any): boolean {
   }
   
   // UI Helpers
-  private showSuccess(message: string): void {
-    this.successMessage = message;
-    setTimeout(() => this.successMessage = '', 5000);
-  }
-  
-  getDistricts(): readonly string[] {
-    return this.DISTRICTS;
-  }
-  
+private showSuccess(message: string): void {
+  this.successMessage = message;
+  setTimeout(() => this.successMessage = '', 5000);
+}
+
+private showError(message: string): void {
+  this.errorMessage = message;
+  setTimeout(() => this.errorMessage = '', 5000);
+}
+
+ getDistricts(): readonly { label: string; value: string }[] {
+  return this.DISTRICTS;
+}
   // For template to track items in ngFor
   trackById(index: number, item: SupportCenterResponse): number | undefined {
     return item.id;
@@ -361,6 +376,14 @@ clearFilters(): void {
   this.selectedDistrictFilter = '';
   this.activeStatusFilter = '';
   this.filteredSupportCenters = [...this.supportCenters]; // Reset to show all
+}
+
+toggleActive(): void {
+  if (this.isEditing && this.selectedSupportCenter) {
+    this.selectedSupportCenter.isActive = !this.selectedSupportCenter.isActive;
+  } else {
+    this.newSupportCenter.isActive = !this.newSupportCenter.isActive;
+  }
 }
 
 }

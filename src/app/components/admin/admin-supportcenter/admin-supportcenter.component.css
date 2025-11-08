@@ -1,66 +1,130 @@
+:root {
+  --primary-color: #b497bd;
+  --secondary-color: #e6daf5;
+  --accent-color: #8367bf;
+  --background-soft: #f8f5fc;
+  --text-dark: #2c2c2c;
+}
+
 /* Estilos generales */
 .card {
   border: none;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  box-shadow: 0 4px 8px #8367bf5b;
   margin-bottom: 1.5rem;
-  border-radius: 0.5rem;
-  overflow: hidden;
+  border-radius: 15px;
+  background-color: white;
 }
 
 .card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: #e6daf5;
+  color: #8367bf;
+  font-weight: 700;
+  font-size: 1.05rem;
+  border-bottom: 2px solid #8367bf;
+  border-radius: 15px 15px 0 0;
   padding: 1rem 1.5rem;
-  font-weight: 600;
-  color: #2c3e50;
 }
-
 /* Tabla */
 .table {
-  margin-bottom: 0;
   font-size: 0.9rem;
+  border-radius: 10px;
+  overflow: hidden;
+  color: #2c2c2c;
 }
 
-.table th {
-  font-weight: 600;
+.table thead {
+  background-color: #e6daf5;
+  color: #8367bf;
   text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.5px;
-  color: #6c757d;
-  background-color: #f8f9fa;
-  border-bottom-width: 1px;
-  padding: 0.75rem 1rem;
-}
-
-.table td {
-  padding: 1rem;
-  vertical-align: middle;
-  border-color: #edf2f7;
+  letter-spacing: 0.4px;
 }
 
 .table-hover tbody tr:hover {
-  background-color: rgba(13, 110, 253, 0.04);
+  background-color: #f2eafc;
+  transition: all 0.2s ease;
+}
+
+.table-active {
+  background-color: #e6daf5 !important;
 }
 
 /* Formularios */
+.form-control,
+.form-select {
+  border: 2px solid rgba(180, 151, 189, 0.4);
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  background-color: #faf7ff;
+  transition: all 0.3s ease;
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1500;
+  backdrop-filter: blur(3px);
+}
+
+.modal-container {
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 0.75rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.status-legend small {
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.status-legend {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 1rem;
+  background-color: #f8f9fa;
+  padding: 0.3rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: #8367bf;
+  box-shadow: 0 0 5px rgba(180, 151, 189, 0.5);
+}
+
+/* 🟣 Etiquetas */
 .form-label {
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  color: #495057;
+  color: #8367bf;
+  font-weight: 600;
+}
+
+/* 🟣 Switch (activo/inactivo) */
+.form-check-input:checked {
+  background-color: #8367bf;
+  border-color: #8367bf;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.legend-item i {
   font-size: 0.9rem;
 }
 
-.form-control, .form-select {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.9rem;
-  border: 1px solid #dee2e6;
-  border-radius: 0.375rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-.form-control:focus, .form-select:focus {
-  border-color: #86b7fe;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+.legend-item small {
+  font-style: italic;
+  font-size: 0.8rem;
+  color: #555;
 }
 
 /* Botones */
@@ -73,80 +137,6 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-}
-
-.status-badge {
-  font-size: 0.75rem;
-  padding: 0.35em 0.65em;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
-.btn-sm {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-  border-radius: 0.25rem;
-}
-
-.btn-primary {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-}
-
-.btn-primary:hover {
-  background-color: #0b5ed7;
-  border-color: #0a58ca;
-}
-
-.btn-outline-primary {
-  color: #0d6efd;
-  border-color: #0d6efd;
-}
-
-.btn-outline-primary:hover {
-  background-color: #0d6efd;
-  color: #fff;
-}
-
-.btn-outline-danger {
-  color: #dc3545;
-  border-color: #dc3545;
-}
-
-.btn-outline-danger:hover {
-  background-color: #dc3545;
-  color: #fff;
-}
-
-/* Badges */
-.badge {
-  font-weight: 500;
-  padding: 0.35em 0.65em;
-  font-size: 0.75em;
-  border-radius: 0.25rem;
-}
-
-/* Alertas */
-.alert {
-  border: none;
-  border-radius: 0.5rem;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.5rem;
-}
-
-.alert-success {
-  background-color: #d1e7dd;
-  color: #0f5132;
-}
-
-.alert-danger {
-  background-color: #f8d7da;
-  color: #842029;
-}
-
-.alert .btn-close {
-  padding: 0.75rem 1.25rem;
 }
 
 /* Loading states */
@@ -166,48 +156,29 @@
    
    
 }
-/* Add these styles to your component's CSS */
-.modal {
-  display: none;
+.table-container {
+  max-height: 400px; /* Ajusta la altura según prefieras */
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-top: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
 }
 
-.modal.show {
-  display: block;
-  opacity: 1;
-  background: rgba(0, 0, 0, 0.5);
+/* Mantiene el encabezado fijo al hacer scroll */
+.table-container table {
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-.modal.hide {
-  display: none !important;
-}
+.table-container thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
 
-.modal-backdrop {
-  opacity: 0.5;
 }
-tr {
-  transition: background-color 0.2s;
-}
-
-tr:hover {
-  background-color: rgba(0, 0, 0, 0.03);
-}
-
-.table-active {
-  background-color: rgba(13, 110, 253, 0.1) !important;
-}
-/* Ensure the table cells have proper spacing */
-.table td {
-  vertical-align: middle;
-}
-
-/* Style for the filter buttons */
-.btn-outline-secondary {
-  padding: 0.375rem 0.5rem;
-}
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .table-responsive {
+  .table-container {
     border: 1px solid #dee2e6;
     border-radius: 0.5rem;
     overflow: hidden;
