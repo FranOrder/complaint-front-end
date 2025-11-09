@@ -9,10 +9,17 @@ import { SupportCenter, SupportCenterResponse, DISTRICTS } from '../../../models
 // Services
 import { SupportCenterService } from '../../../services/support-center.service';
 
+// Components
+import { ToastComponent } from '../../../shared/components/toast/toast.component';
+
 @Component({
   selector: 'app-admin-supportcenter',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule, 
+    FormsModule, 
+    ToastComponent
+  ],
   templateUrl: './admin-supportcenter.component.html',
   styleUrls: ['./admin-supportcenter.component.css']
 })
@@ -37,9 +44,10 @@ selectedSupportCenterId: number | null = null;
   selectedDistrictFilter = '';
   activeStatusFilter: boolean | '' = '';
   
-  // UI state
-  errorMessage = '';
-  successMessage = '';
+  // Toast state
+  isToastVisible = false;
+  toastMessage = '';
+  toastType: 'success' | 'error' | 'warning' | 'info' = 'info';
 
   // Constants
  readonly DISTRICTS = DISTRICTS;
@@ -114,24 +122,23 @@ onActiveStatusChange(event: Event): void {
   }
 }
   // Data loading
-private loadSupportCenters(): void {
-  this.isLoading = true;
-  this.errorMessage = '';
-
-  this.supportCenterService.getAllSupportCenters()
-    .pipe(takeUntil(this.destroy$))
-    .subscribe({
-      next: (data) => {
-        this.supportCenters = data.map(center => this.mapSupportCenter(center));
-        this.filteredSupportCenters = [...this.supportCenters];
-        this.isLoading = false;
-      },
-      error: (error) => {
-        this.handleError(error, 'Error al cargar los centros de ayuda');
-        this.isLoading = false;
-      }
-    });
-}
+  private loadSupportCenters(): void {
+    this.isLoading = true;
+    
+    this.supportCenterService.getAllSupportCenters()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.supportCenters = data.map(center => this.mapSupportCenter(center));
+          this.filteredSupportCenters = [...this.supportCenters];
+          this.isLoading = false;
+        },
+        error: (error) => {
+          this.handleError(error, 'Error al cargar los centros de ayuda');
+          this.isLoading = false;
+        }
+      });
+  }
 onAddNew(): void {
   this.isFormVisible = true;
   this.isEditing = false;
@@ -172,8 +179,7 @@ saveSupportCenter(): void {
 
   // 🔹 Validar antes de enviar
   if (!this.validateForm(center)) {
-    this.showError(this.errorMessage); // Muestra el mensaje temporalmente
-    return;
+    return; // El mensaje de error ya se muestra en validateForm
   }
 
   // 🔹 Crear o actualizar según corresponda
@@ -201,25 +207,24 @@ saveSupportCenter(): void {
 }
 
   deleteSupportCenter(id: number): void {
-  if (!confirm('¿Está seguro de eliminar este centro de ayuda? Esta acción no se puede deshacer.')) {
-    return;
+    if (!confirm('¿Está seguro de eliminar este centro de ayuda? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    this.isLoading = true;
+
+    this.supportCenterService.deleteSupportCenter(id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.loadSupportCenters();
+          this.showToast('Centro de ayuda eliminado correctamente', 'success');
+          this.selectedSupportCenter = null;
+          this.selectedSupportCenterId = null;
+        },
+        error: (error) => this.handleError(error, 'Error al eliminar el centro de ayuda')
+      });
   }
-
-  this.isLoading = true;
-  this.errorMessage = '';
-
-  this.supportCenterService.deleteSupportCenter(id)
-    .pipe(takeUntil(this.destroy$))
-    .subscribe({
-      next: () => {
-        this.loadSupportCenters();
-        this.showSuccess('Centro de ayuda eliminado correctamente');
-        this.selectedSupportCenter = null;
-        this.selectedSupportCenterId = null;
-      },
-      error: (error) => this.handleError(error, 'Error al eliminar el centro de ayuda')
-    });
-}
 
   // UI Helpers
 editSupportCenter(center: SupportCenter): void {
@@ -236,7 +241,7 @@ cancelEdit(): void {
 
   // Form Helpers
 private handleSaveSuccess(message: string): void {
-  this.showSuccess(message);
+  this.showToast(message, 'success');
   this.isFormVisible = false;
   this.loadSupportCenters();
   this.resetForm();
@@ -246,7 +251,6 @@ private handleSaveSuccess(message: string): void {
     this.newSupportCenter = this.getDefaultSupportCenter();
     this.selectedSupportCenter = null;
     this.isEditing = false;
-    this.errorMessage = '';
   }
   
   private getDefaultSupportCenter(): Partial<SupportCenter> {
@@ -299,7 +303,7 @@ private handleSaveSuccess(message: string): void {
 
     const failedValidation = validations.find(v => v.condition);
     if (failedValidation) {
-      this.errorMessage = failedValidation.message;
+      this.showToast(failedValidation.message, 'error');
       return false;
     }
     
@@ -343,24 +347,38 @@ onFilterClick(): void {
     console.error(error);
     
     if (error.status === 401 || error.status === 403) {
-      this.errorMessage = 'Sesión expirada. Por favor, inicie sesión nuevamente.';
+      this.showToast('Sesión expirada. Por favor, inicie sesión nuevamente.', 'error');
     } else {
-      this.errorMessage = error.error?.message || defaultMessage;
+      this.showToast(error.error?.message || defaultMessage, 'error');
     }
     
     this.isLoading = false;
   }
   
   // UI Helpers
-private showSuccess(message: string): void {
-  this.successMessage = message;
-  setTimeout(() => this.successMessage = '', 5000);
-}
+  /**
+   * Muestra un mensaje toast con el tipo especificado
+   * @param message Mensaje a mostrar
+   * @param type Tipo de notificación (success, error, warning, info)
+   */
+  showToast(message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info'): void {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.isToastVisible = true;
+  }
 
-private showError(message: string): void {
-  this.errorMessage = message;
-  setTimeout(() => this.errorMessage = '', 5000);
-}
+  // Métodos de conveniencia para mantener la compatibilidad
+  private showSuccess(message: string): void {
+    this.showToast(message, 'success');
+  }
+
+  private showError(message: string): void {
+    this.showToast(message, 'error');
+  }
+
+  onToastClosed(): void {
+    this.isToastVisible = false;
+  }
 
  getDistricts(): readonly { label: string; value: string }[] {
   return this.DISTRICTS;

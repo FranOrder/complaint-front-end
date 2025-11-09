@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { UserProfile, UpdateProfileRequest } from '../models/user.model';
+import { 
+  UserProfile, 
+  UpdateProfileRequest, 
+  UserResponse, 
+  CreateUserRequest, 
+  UserRole,
+  UserFilters
+} from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
 
@@ -25,13 +32,12 @@ export class UserService {
       { headers: this.getAuthHeaders() }
     );
   }
-updateProfile(userId: number, data: UpdateProfileRequest): Observable<UserProfile> {
-  return this.http.put<UserProfile>( 
-    `${this.apiUrl}/${userId}`,        
-    data,
-    { headers: this.getAuthHeaders() }
-  );
-}
+
+  updateProfile(userId: number, data: UpdateProfileRequest): Observable<UserProfile> {
+    return this.http.put<UserProfile>(`${this.apiUrl}/${userId}`, data, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
 
   getCurrentUserId(): number | null {
@@ -45,6 +51,35 @@ updateProfile(userId: number, data: UpdateProfileRequest): Observable<UserProfil
     return null;
   }
 }
+
+
+  // Admin user management methods
+   getAllUsers(): Observable<UserResponse[]> {
+    return this.http.get<UserResponse[]>(`${this.apiUrl}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+
+ createUser(userData: CreateUserRequest): Observable<UserResponse> {
+    return this.http.post<UserResponse>(`${this.apiUrl}/admin`, userData, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  updateUser(id: number, userData: UpdateProfileRequest): Observable<UserResponse> {
+    return this.http.put<UserResponse>(
+      `${this.apiUrl}/${id}`,
+      userData,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  deleteUser(userId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${userId}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
 
 
   private getAuthHeaders(isFormData: boolean = false): HttpHeaders {

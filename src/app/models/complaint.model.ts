@@ -8,14 +8,11 @@ export interface Evidence {
   id: number;
   url: string;
   type: string;
-}
-
-export interface FileMetadata {
-  id: number;
-  fileName: string;
-  fileType: string;
-  fileSize: number;
-  uploadDate: string;
+  filename?: string;
+  fileName?: string;
+  fileType?: string;
+  fileSize?: number;
+  uploadedAt?: string;
 }
 
 export interface Complaint {
@@ -33,6 +30,17 @@ export interface Complaint {
   isExpanded?: boolean;
   aggressor?: Aggressor;
   evidences?: Evidence[];
+  
+  // Propiedades para la vista
+  victimName?: string;
+  victimEmail?: string;
+  victimPhone?: string;
+  victim?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phoneNumber?: string;
+  };
 }
 
 export const STATUS_LABELS: {[key: string]: string} = {

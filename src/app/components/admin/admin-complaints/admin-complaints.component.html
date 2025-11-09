@@ -1,68 +1,364 @@
 <div class="container-fluid py-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Gestión de Denuncias</h2>
-    <div>
-      <button class="btn btn-outline-secondary me-2">
-        <i class="bi bi-funnel"></i> Filtrar
-      </button>
-      <button class="btn btn-outline-primary">
-        <i class="bi bi-download"></i> Exportar
-      </button>
-    </div>
-  </div>
+  <!-- Toast Notification -->
+  <app-toast 
+    [message]="toastMessage" 
+    [type]="toastType" 
+    [show]="showToast"
+    (closed)="onToastClosed()"
+    [autoClose]="true"
+    [autoCloseDelay]="5000">
+  </app-toast>
 
-  <div class="card">
+  <!-- Filters Card -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5><i class="bi bi-clipboard-check me-2"></i>Gestión de Denuncias</h5>
+    </div>
     <div class="card-body">
-      <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Título</th>
-              <th>Usuario</th>
-              <th>Fecha</th>
-              <th>Estado</th>
-              <th>Prioridad</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let complaint of complaints">
-              <td>#{{ complaint.id }}</td>
-              <td>{{ complaint.title }}</td>
-              <td>{{ complaint.userName }}</td>
-              <td>{{ complaint.date | date:'short' }}</td>
-              <td>
-                <span class="badge" [ngClass]="{
-                  'bg-warning': complaint.status === 'Pendiente',
-                  'bg-info': complaint.status === 'En Progreso',
-                  'bg-success': complaint.status === 'Resuelta',
-                  'bg-danger': complaint.status === 'Rechazada'
-                }">
-                  {{ complaint.status }}
-                </span>
-              </td>
-              <td>
-                <span class="badge" [ngClass]="{
-                  'bg-danger': complaint.priority === 'Alta',
-                  'bg-warning': complaint.priority === 'Media',
-                  'bg-primary': complaint.priority === 'Baja'
-                }">
-                  {{ complaint.priority }}
-                </span>
-              </td>
-              <td>
-                <button class="btn btn-sm btn-outline-primary" (click)="viewComplaint(complaint.id)">
-                  <i class="bi bi-eye"></i> Ver
-                </button>
-              </td>
-            </tr>
-            <tr *ngIf="complaints.length === 0">
-              <td colspan="7" class="text-center">No hay denuncias registradas</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="row mb-3">
+        <div class="col-md-4">
+         
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="searchTerm" 
+              [(ngModel)]="searchTerm" 
+              (keyup.enter)="onFilterClick()"
+              placeholder="Buscar por nombre, descripción o ubicación...">
+          </div>
+        </div>
+
+        <!-- Status Filter -->
+        <div class="col-md-3">
+          
+          <select 
+            id="statusFilter" 
+            class="form-select" 
+            [(ngModel)]="selectedStatus">
+            <option [value]="''">Todos los estados</option>
+            <option *ngFor="let status of statusOptions" [value]="status.value">
+              {{ status.label }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Violence Type Filter -->
+        <div class="col-md-3">
+         
+          <select 
+            id="violenceTypeFilter" 
+            class="form-select" 
+            [(ngModel)]="violenceTypeFilter">
+            <option [value]="">Todos los tipos</option>
+            <option *ngFor="let type of violenceTypes" [value]="type.value">
+              {{ type.label }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-2 d-flex gap-2">
+          <button class="btn btn-outline-secondary" (click)="clearFilters()" [disabled]="!hasActiveFilters()">
+            <i class="bi bi-x-circle"></i>
+          </button>
+          <button class="btn btn-primary" (click)="onFilterClick()" [disabled]="isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+            <i *ngIf="!isLoading" class="bi bi-funnel me-1"></i>
+            {{ isLoading ? 'Cargando...' : 'Filtrar' }}
+          </button>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Complaints Table -->
+  <div class="card">
+    <div class="card-body d-flex flex-column" style="max-height: 75vh; overflow: hidden;">
+      <div class="table-responsive flex-grow-1" style="overflow-y: auto;">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th class="text-center">ID</th>
+              <th class="text-center">Víctima</th>
+              <th class="text-center">Descripción</th>
+              <th class="text-center">Fecha</th>
+              <th class="text-center">Tipo de Violencia</th>
+              <th class="text-center">Estado</th>
+              <th class="text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Estado: Cargando -->
+            <tr *ngIf="isLoading">
+              <td colspan="7" class="text-center py-4">
+                <div class="d-flex justify-content-center align-items-center">
+                  <div class="spinner-border text-primary me-2" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                  </div>
+                  <span>Cargando denuncias...</span>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Sin resultados -->
+            <tr *ngIf="!isLoading && complaints.length === 0">
+              <td colspan="7" class="text-center py-4 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                No se encontraron denuncias
+              </td>
+            </tr>
+
+            <!-- Lista -->
+            <ng-container *ngFor="let complaint of complaints; trackBy: trackById">
+              <tr class="complaint-row">
+                <td class="fw-bold text-center">#{{ complaint.id }}</td>
+                <td>
+                  <div class="d-flex align-items-center text-center justify-content-center ">
+                    <div class="avatar-sm bg-light rounded-circle me-2 d-flex align-items-center justify-content-center">
+                      <i class="bi bi-person text-muted"></i>
+                    </div>
+                    <div>
+                      <div class="fw-medium text-center">{{ complaint.victimName || 'Anónimo' }}</div>
+                      
+                    </div>
+                  </div>
+                </td>
+                <td class="text-truncate text-center" style="max-width: 250px;" [title]="complaint.description">
+                  {{ complaint.description | truncate:100 }}
+                </td>
+                <td class="text-center">
+                  <div class="small text-muted">{{ formatDate(complaint.incidentDate) }}</div>
+                </td>
+                <td class="text-center">
+                  <span class="badge bg-light text-dark">
+                    {{ violenceTypeLabels[complaint.violenceType] || complaint.violenceType }}
+                  </span>
+                </td>
+                <td class="text-center">
+                  <span class="badge" [ngClass]="getStatusBadgeClass(complaint.status)">
+                    {{ statusLabels[complaint.status] || complaint.status }}
+                  </span>
+                </td>
+                <td class="text-center align-items-center justify-content-center d-flex ">
+                  <button (click)="toggleComplaintDetails(complaint)" 
+                          class="btn btn-sm btn-outline-primary d-flex align-items-center">
+                    <span class="me-1">
+                      {{ complaint.isExpanded ? 'Ocultar' : 'Ver' }} detalles
+                    </span>
+                    <i class="bi" 
+                       [class.bi-chevron-down]="!complaint.isExpanded" 
+                       [class.bi-chevron-up]="complaint.isExpanded"></i>
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Fila expandida con detalles -->
+<!-- 🔹 Modal Detalles Denuncia -->
+
+
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 🔹 Paginador -->
+      <div class="d-flex justify-content-between align-items-center p-3 border-top" *ngIf="totalItems > 0">
+        <div class="text-muted small">
+          Mostrando {{ startItemNumber }} a {{ endItemNumber }} de {{ totalItems }} registros
+        </div>
+        <nav aria-label="Page navigation" *ngIf="totalItems > (itemsPerPage || 10)">
+          <ul class="pagination pagination-sm mb-0" >
+            <li class="page-item" [class.disabled]="(currentPage || 1) === 1" >
+              <a class="page-link" href="javascript:void(0)" (click)="onPageChange((currentPage || 1) - 1)" >&laquo;</a>
+            </li>
+            <li class="page-item" *ngFor="let page of getPageNumbers()" [class.active]="page === (currentPage || 1)">
+              <a class="page-link" href="javascript:void(0)" (click)="onPageChange(page) " >{{ page }}</a>
+            </li>
+            <li class="page-item" [class.disabled]="(currentPage || 1) * (itemsPerPage || 10) >= (totalItems || 0)">
+              <a class="page-link" href="javascript:void(0)" (click)="onPageChange((currentPage || 1) + 1)" >&raquo;</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div><div
+  class="modal-overlay"
+  tabindex="-1"
+  *ngIf="selectedComplaint"
+
+>
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+
+  <div class="modal-content shadow-lg border-0 rounded-3">
+      
+      <!-- Header -->
+      <div class="modal-header ">
+        <h5 class="modal-title">
+          <i class="bi bi-info-circle me-2"></i>
+          Detalles de la denuncia #{{ selectedComplaint.id }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close "
+
+          (click)="closeModal()"
+        ></button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body">
+        <div class="row g-3">
+          
+          <!-- Información de la víctima -->
+          <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-header fw-bold">
+                <i class="bi bi-person-vcard me-2"></i>Víctima
+              </div>
+              <div class="card-body">
+                <p><strong>ID:</strong> {{ selectedComplaint.victimId || 'N/A' }}</p>
+                <p><strong>Nombre:</strong> {{ selectedComplaint.victimName || 'No especificado' }}</p>
+                <p>
+                  <strong>Email:</strong>
+                  {{ selectedComplaint.victimEmail || selectedComplaint.victim?.email || 'No especificado' }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Información del agresor -->
+          <div class="col-md-6" *ngIf="selectedComplaint.aggressor">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-header fw-bold">
+                <i class="bi bi-person-x me-2"></i>Agresor
+              </div>
+              <div class="card-body">
+                <p><strong>Nombre:</strong> {{ selectedComplaint.aggressor.fullName || 'No especificado' }}</p>
+                <p><strong>Relación:</strong> {{ getRelationshipLabel(selectedComplaint.aggressor.relationship) }}</p>
+                <p *ngIf="selectedComplaint.aggressor.additionalDetails">
+                  <strong>Detalles:</strong> {{ selectedComplaint.aggressor.additionalDetails }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detalles del incidente -->
+          <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-header fw-bold">
+                <i class="bi bi-calendar3 me-2"></i>Incidente
+              </div>
+              <div class="card-body">
+                <p>
+                  <strong>Estado:</strong>
+                  <span class="badge" [ngClass]="getStatusBadgeClass(selectedComplaint.status)">
+                    {{ statusLabels[selectedComplaint.status] || selectedComplaint.status }}
+                  </span>
+                </p>
+                <p><strong>Tipo:</strong> {{ getViolenceTypeLabel(selectedComplaint.violenceType) }}</p>
+                <p><strong>Fecha:</strong> {{ selectedComplaint.incidentDate | date:'longDate' }}</p>
+                <p><strong>Ubicación:</strong> {{ selectedComplaint.incidentLocation || 'No especificada' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Registro -->
+          <div class="col-md-6">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-header fw-bold">
+                <i class="bi bi-clock-history me-2"></i>Registro
+              </div>
+              <div class="card-body">
+                <p><strong>Creación:</strong> {{ selectedComplaint.createdAt | date:'medium' }}</p>
+                <p><strong>Última actualización:</strong> {{ selectedComplaint.updatedAt | date:'medium' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div class="mt-4">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header fw-bold">
+              <i class="bi bi-chat-square-text me-2"></i>Descripción
+            </div>
+            <div class="card-body">
+              <p>{{ selectedComplaint.description || 'No se proporcionó una descripción' }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Evidencias -->
+        <div class="mt-4">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header fw-bold">
+              <i class="bi bi-paperclip me-2"></i>Evidencias adjuntas
+            </div>
+            <div class="card-body">
+              <ng-container *ngIf="selectedComplaint.evidences?.length; else noEvidences">
+                <div class="d-flex flex-wrap gap-3">
+                  <div
+                    *ngFor="let evidence of selectedComplaint.evidences"
+                    class="p-2 border rounded d-flex align-items-center"
+                  >
+                    <div class="btn btn-outline-secondary btn-sm d-flex align-items-center shadow-sm">
+                      <i class="bi bi-file-earmark me-1"></i>
+                      {{ evidence.fileType?.split('/')[1]?.toUpperCase() || 'ARCHIVO' }}
+                    </div>
+                    <div class="ms-2">
+                      <div
+                        class="fw-medium text-truncate"
+                        style="max-width: 200px;"
+                        title="{{ evidence.filename }}"
+                      >
+                        {{ evidence.filename }}
+                      </div>
+                      <div class="text-muted small">
+                        {{ (evidence.fileSize / 1024).toFixed(2) }} KB
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+
+              <ng-template #noEvidences>
+                <div class="text-center text-muted py-3">
+                  <i class="bi bi-inbox fs-3"></i><br />
+                  No hay evidencias adjuntas
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <!-- 🔹 Botones de acción -->
+        <div class="mt-4 d-flex justify-content-end gap-2">
+          <button 
+            class="btn btn-outline-secondary" 
+            (click)="updateStatus(selectedComplaint, 'IN_REVIEW')"
+            [hidden]="shouldHideStatusButton(selectedComplaint.status, 'IN_REVIEW')">
+            <i class="bi bi-hourglass-split me-1"></i> En Revisión
+          </button>
+
+          <button 
+            class="btn btn-outline-primary" 
+            (click)="updateStatus(selectedComplaint, 'ACTION_TAKEN')"
+            [hidden]="shouldHideStatusButton(selectedComplaint.status, 'ACTION_TAKEN')">
+            <i class="bi bi-check2-circle me-1"></i> Acción Tomada
+          </button>
+
+          <button 
+            class="btn btn-outline-success" 
+            (click)="updateStatus(selectedComplaint, 'CLOSED')"
+            [hidden]="shouldHideStatusButton(selectedComplaint.status, 'CLOSED')">
+            <i class="bi bi-check-circle me-1"></i> Cerrar Caso
+          </button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
 </div>
+</div>
+

@@ -22,12 +22,24 @@ import { Complaint, STATUS_LABELS, VIOLENCE_TYPE_LABELS, RELATIONSHIP_LABELS } f
 })
 
 export class VictimProfileComponent implements OnInit {
-  user: UserProfile | null = null;
+  
   complaints: Complaint[] = [];
   isLoading = false;
   isEditingPhone = false;
   error: string | null = null;
   success: string | null = null;
+  
+user: UserProfile = {
+  id: 0,
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  role: 'VICTIM' as const,
+  isActive: true,
+  createdAt: '',
+  updatedAt: ''
+};
 
   get fullName(): string {
     return this.user ? `${this.user.firstName} ${this.user.lastName}`.trim() : '';
@@ -67,7 +79,10 @@ private loadUserProfile(): void {
         lastName: lastName || '',
         email: profile.email,
         phone: profile.phone,
-        role: profile.role
+        role: profile.role,
+        isActive: profile.isActive !== undefined ? profile.isActive : true,
+        createdAt: profile.createdAt || '',
+        updatedAt: profile.updatedAt || ''
       };
 
       this.phoneForm.patchValue({ phone: this.user.phone });

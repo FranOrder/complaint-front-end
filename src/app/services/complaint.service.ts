@@ -1,9 +1,16 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpEvent } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpEvent, HttpParams } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, tap, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { Complaint, FileMetadata } from '../models/complaint.model';
+import { Complaint, } from '../models/complaint.model';
+
+export interface ComplaintFilters {
+  status?: string;
+  searchTerm?: string;
+  page?: number;
+  limit?: number;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -45,33 +52,37 @@ export class ComplaintService {
   }
 
   getComplaints(): Observable<Complaint[]> {
-  const token = localStorage.getItem('auth_token');
+    const token = localStorage.getItem('auth_token');
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    
+    return this.http.get<Complaint[]>(`${this.apiUrl}/my-complaints`, {
+      headers,
+      withCredentials: true
+    }).pipe(
+      map((complaints) =>
+        complaints.map((c) => ({
+          ...c,
+          // Mapear el agresor
+          aggressor: {
+            fullName: c.aggressorFullName || 'No registrado',
+            relationship: c.aggressorRelationship || 'No especificada',
+            additionalDetails: c.aggressorAdditionalDetails || 'Sin detalles'
+          },
+          // Mapear la víctima si está disponible
+          victimName: c['victim'] ? 
+            `${c['victim'].firstName || ''} ${c['victim'].lastName || ''}`.trim() || 'Anónimo' :
+            'Anónimo',
+          victimEmail: c['victim']?.email || 'No especificado',
+          victimPhone: c['victim']?.phoneNumber || 'No especificado'
+        }))
+      ),
+      catchError(this.handleError)
+    );
+  }
 
-  const headers = new HttpHeaders({
-    'Authorization': `Bearer ${token}`
-  });
-  
-
-  return this.http.get<Complaint[]>(`${this.apiUrl}/my-complaints`, {
-    headers,
-    withCredentials: true
-  }).pipe(
-    map((complaints) =>
-      complaints.map((c) => ({
-        ...c,
-        // 🔧 Crear el objeto aggressor directamente aquí
-        aggressor: {
-          fullName: c.aggressorFullName || 'No registrado',
-          relationship: c.aggressorRelationship || 'No especificada',
-          additionalDetails: c.aggressorAdditionalDetails || 'Sin detalles'
-        },
-      }))
-    ),
-    catchError(this.handleError)
-  );
-}
-
- getComplaintById(id: number): Observable<Complaint> {
+getComplaintById(id: number): Observable<Complaint> {
   const token = localStorage.getItem('auth_token');
   const headers = new HttpHeaders({
     'Authorization': `Bearer ${token}`
@@ -79,31 +90,105 @@ export class ComplaintService {
 
   return this.http.get<Complaint>(`${this.apiUrl}/${id}`, { headers, withCredentials: true })
     .pipe(
-      tap(response => console.log('Detalles completos de la denuncia:', response)),
-      catchError(this.handleError)
+      map(response => {
+        // Create a new complaint object with all required properties
+        const complaint: Complaint = {
+          id: response.id,
+          description: response.description || '',
+          status: response.status || 'PENDING',
+          violenceType: response.violenceType || 'OTHER',
+          incidentDate: response.incidentDate || null,
+          incidentLocation: response.incidentLocation || null,
+          aggressorFullName: response.aggressor?.fullName || '',
+          aggressorRelationship: response.aggressor?.relationship || null,
+          aggressorAdditionalDetails: response.aggressor?.additionalDetails || null,
+          victimName: response.victimName || '',
+          victimEmail: response.victimEmail || '',
+          victimPhone: response.victimPhone || '',
+          createdAt: response.createdAt || new Date().toISOString(),
+          updatedAt: response.updatedAt || new Date().toISOString()
+        };
+
+        // Add optional properties if they exist
+        if (response.aggressor) {
+          complaint.aggressor = {
+            fullName: response.aggressor.fullName || '',
+            relationship: response.aggressor.relationship || null,
+            additionalDetails: response.aggressor.additionalDetails || null
+          };
+        }
+
+        if (response.evidences && Array.isArray(response.evidences)) {
+          complaint.evidences = response.evidences.map(e => ({
+            id: e.id,
+            url: `${this.apiUrl}/${response.id}/files/${e.id}`,
+            fileType: e.fileType || 'unknown',
+            filename: e.fileName || e.filename || `file-${e.id}`,
+            fileSize: e.fileSize,
+            uploadedAt: e.uploadedAt,
+            type: e.fileType?.split('/')[1]?.toUpperCase() || 'ARCHIVO'  // Add this for backward compatibility
+          }));
+        }
+
+        if (response.victim) {
+          complaint.victim = {
+            firstName: response.victim.firstName || '',
+            lastName: response.victim.lastName || '',
+            email: response.victim.email || '',
+            
+          };
+        }
+
+        return complaint;
+      }),
+      tap(response => console.log('Detalles completos de la denuncia mapeados:', response)),
+      catchError(error => {
+        console.error('Error al obtener los detalles de la denuncia:', error);
+        return throwError(() => new Error('No se pudieron cargar los detalles de la denuncia'));
+      })
     );
 }
-// In complaint.service.ts
-getEvidenceUrl(fileName: string): string {
-  return `${environment.apiUrl}/files/${fileName}`;
-}
+
+
   // Update complaint status
   updateComplaintStatus(id: number, status: string): Observable<Complaint> {
     // Get the token from localStorage
     const token = localStorage.getItem('auth_token');
+    if (!token) {
+      return throwError(() => new Error('No se encontró el token de autenticación'));
+    }
     
     // Create headers with the token
     const headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json'
     });
     
+    const url = `${this.apiUrl}/${id}/status`;
+    
+    // The backend expects a JSON object with a 'newStatus' field
+    const requestBody = { newStatus: status };
+    
+    console.log('Sending status update request to:', url);
+    console.log('Request body:', requestBody);
+    
     return this.http.patch<Complaint>(
-      `${this.apiUrl}/${id}/status`, 
-      { status },
-      { headers, withCredentials: true }
+      url, 
+      requestBody,
+      { 
+        headers,
+        withCredentials: true
+      }
     ).pipe(
-      catchError(this.handleError)
+      tap(updatedComplaint => {
+        console.log('Status updated successfully:', updatedComplaint);
+        return updatedComplaint;
+      }),
+      catchError(error => {
+        console.error('Error updating status:', error);
+        return throwError(() => error);
+      })
     );
   }
 
@@ -198,42 +283,7 @@ getEvidenceUrl(fileName: string): string {
     );
   }
 
-  // Get files for a complaint
-  getComplaintFiles(complaintId: number): Observable<FileMetadata[]> {
-    // Get the token from localStorage
-    const token = localStorage.getItem('auth_token');
-    
-    // Create headers with the token
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-    
-    return this.http.get<FileMetadata[]>(`${this.apiUrl}/${complaintId}/files`, {
-      headers,
-      withCredentials: true
-    }).pipe(
-      catchError(this.handleError)
-    );
-  }
 
-  // Download a file
-  downloadFile(complaintId: number, fileId: number): Observable<Blob> {
-    // Get the token from localStorage
-    const token = localStorage.getItem('auth_token');
-    
-    // Create headers with the token
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
-    });
-    
-    return this.http.get(`${this.apiUrl}/${complaintId}/files/${fileId}`, {
-      headers,
-      responseType: 'blob',
-      withCredentials: true
-    }).pipe(
-      catchError(this.handleError)
-    );
-  }
 
   // Format complaint data before sending to the server
   private formatComplaintData(complaintData: any): any {
@@ -263,6 +313,38 @@ getEvidenceUrl(fileName: string): string {
       aggressorRelationship: complaintData.aggressorRelationship || null,
       aggressorAdditionalDetails: complaintData.aggressorAdditionalDetails || null
     };
+  }
+
+  // Get all complaints with optional filters
+  getAllComplaints(status?: string, violenceType?: string): Observable<Complaint[]> {
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      return throwError(() => new Error('No se encontró el token de autenticación'));
+    }
+
+    let url = `${this.apiUrl}`;
+    let params = new HttpParams();
+    
+    if (status) {
+      params = params.set('status', status);
+    }
+    
+    if (violenceType) {
+      params = params.set('violenceType', violenceType);
+    }
+
+    return this.http.get<Complaint[]>(url, {
+      headers: new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+      }),
+      params: params
+    }).pipe(
+      map(response => Array.isArray(response) ? response : []),
+      catchError(error => {
+        console.error('Error fetching complaints:', error);
+        return throwError(() => error);
+      })
+    );
   }
 
   // Handle HTTP errors

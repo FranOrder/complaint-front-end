@@ -1,59 +1,265 @@
 <div class="container-fluid py-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Gestión de Usuarios</h2>
-    <button class="btn btn-primary" routerLink="/admin/users/new">
-      <i class="bi bi-plus-circle"></i> Nuevo Usuario
-    </button>
+  <!-- Toast Notification -->
+  <app-toast 
+    *ngIf="showToast" 
+    [message]="toastMessage" 
+    [type]="toastType" 
+    (close)="showToast = false">
+  </app-toast>
+
+  <!-- User Form Modal -->
+  <div class="modal-overlay" *ngIf="isFormVisible">
+    <div class="modal-container card shadow-lg">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">{{ isEditing ? 'Editar' : 'Nuevo' }} Usuario</h5>
+        <button type="button" class="btn-close" (click)="cancelEdit()" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="card-body">
+        <form (ngSubmit)="saveUser()" #userForm="ngForm" [class.was-validated]="userForm.submitted">
+          <div class="row g-3">
+            <!-- First Name -->
+            <div class="col-md-6">
+              <label for="firstName" class="form-label">Nombres <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="firstName"
+                    [(ngModel)]="(isEditing ? selectedUser : newUser).firstName"
+                    name="firstName" required>
+              <div class="invalid-feedback">Por favor ingrese el nombre</div>
+            </div>
+
+            <!-- Last Name -->
+            <div class="col-md-6">
+              <label for="lastName" class="form-label">Apellidos <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="lastName"
+                    [(ngModel)]="(isEditing ? selectedUser : newUser).lastName"
+                    name="lastName" required>
+              <div class="invalid-feedback">Por favor ingrese el apellido</div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-md-6">
+              <label for="email" class="form-label">Correo Electrónico <span class="text-danger">*</span></label>
+              <input type="email" class="form-control" id="email"
+                    [readonly]="isEditing"
+                    [(ngModel)]="(isEditing ? selectedUser : newUser).email"
+                    name="email" required email>
+              <div class="invalid-feedback">Por favor ingrese un correo electrónico válido</div>
+            </div>
+
+            <!-- Phone -->
+            <div class="col-md-6">
+              <label for="phone" class="form-label">Teléfono <span class="text-danger">*</span></label>
+              <input type="tel" class="form-control" id="phone"
+                    [(ngModel)]="(isEditing ? selectedUser : newUser).phone"
+                    name="phone" required>
+              <div class="invalid-feedback">Por favor ingrese el teléfono</div>
+            </div>
+
+            <!-- Password (only for new users) -->
+            <div class="col-md-6" *ngIf="!isEditing">
+              <label for="password" class="form-label">Contraseña <span class="text-danger">*</span></label>
+              <input type="password" class="form-control" id="password"
+                    [(ngModel)]="newUser.password"
+                    name="password" required minlength="6">
+              <div class="invalid-feedback">La contraseña debe tener al menos 6 caracteres</div>
+            </div>
+
+            <!-- Role -->
+            <div class="col-md-6">
+              <label for="role" class="form-label">Rol <span class="text-danger">*</span></label>
+              <select id="role"
+                      [(ngModel)]="(isEditing ? selectedUser : newUser).role"
+                      name="role"
+                      class="form-select"
+                      required>
+                <option [ngValue]="null" disabled>Seleccione un rol</option>
+                <option *ngFor="let role of ROLES" [ngValue]="role.value">
+                  {{ role.label }}
+                </option>
+              </select>
+              <div class="invalid-feedback">Por favor seleccione un rol</div>
+            </div>
+
+            <!-- Status (only when editing) -->
+            <div class="col-12" *ngIf="isEditing">
+              <div class="form-check form-switch">
+                <input class="form-check-input"
+                       type="checkbox"
+                       id="isActive"
+                       [(ngModel)]="selectedUser.isActive"
+                       name="isActive">
+                <label class="form-check-label" for="isActive">
+                  {{ selectedUser?.isActive ? 'Activo' : 'Inactivo' }}
+                </label>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="col-12">
+              <div class="d-flex justify-content-end gap-2 mt-3">
+                <button type="button" 
+                        class="btn btn-secondary" 
+                        (click)="cancelEdit()" 
+                        [disabled]="isLoading">
+                  Cancelar
+                </button>
+                <button type="submit" 
+                        class="btn btn-primary" 
+                        [disabled]="isLoading || userForm.invalid">
+                  {{ isEditing ? 'Actualizar' : 'Guardar' }}
+                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 
+  <!-- Main Content -->
   <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+      <h5 class="mb-0">Gestión de Usuarios</h5>
+
+      <div class="d-flex align-items-center gap-3 ms-auto">
+        <!-- Status Legend -->
+        <div class="status-legend">
+          <span class="legend-item">
+            <i class="bi bi-circle-fill text-success"></i>
+            <small><em>Activo</em></small>
+          </span>
+          <span class="legend-item">
+            <i class="bi bi-circle-fill text-danger"></i>
+            <small><em>Inactivo</em></small>
+          </span>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex align-items-center gap-2">
+          <button class="btn btn-success" 
+                  (click)="onAddNew()" 
+                  [disabled]="isFormVisible && !isEditing"
+                  title="Agregar nuevo usuario">
+            <i class="bi bi-plus-circle"></i> Agregar
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="card-body">
+      <!-- Filters -->
+      <div class="row mb-3">
+        <div class="col-md-5">
+          <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" 
+                   class="form-control" 
+                   placeholder="Buscar por nombre, apellido o email..."
+                   [(ngModel)]="searchTerm" 
+                   (keyup.enter)="onFilterClick()">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" [(ngModel)]="selectedRoleFilter">
+            <option value="">Todos los roles</option>
+            <option *ngFor="let role of ROLES" [value]="role.value">
+              {{ role.label }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select class="form-select" [(ngModel)]="activeStatusFilter">
+            <option [ngValue]="''">Todos los estados</option>
+            <option [ngValue]="true">Activos</option>
+            <option [ngValue]="false">Inactivos</option>
+          </select>
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+          <button class="btn btn-primary" 
+                  (click)="onFilterClick()" 
+                  [disabled]="isLoading"
+                  title="Aplicar filtros">
+            <i class="bi bi-funnel"></i> Filtrar
+          </button>
+          <button class="btn btn-outline-secondary" 
+                  (click)="clearFilters()" 
+                  title="Limpiar filtros" 
+                  [disabled]="isLoading">
+            <i class="bi bi-x-circle"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Users Table -->
       <div class="table-responsive">
-        <table class="table table-hover">
-          <thead>
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
             <tr>
               <th>ID</th>
-              <th>Nombre</th>
+              <th>Nombres</th>
+              <th>Apellidos</th>
               <th>Email</th>
+              <th>Teléfono</th>
               <th>Rol</th>
               <th>Estado</th>
               <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let user of users">
-              <td>{{ user.id }}</td>
-              <td>{{ user.firstName }} {{ user.lastName }}</td>
+            <tr *ngIf="isLoading">
+              <td colspan="8" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Cargando...</span>
+                </div>
+              </td>
+            </tr>
+            <tr *ngFor="let user of filteredUsers; trackBy: trackById"
+                [class.table-active]="isSelected(user.id)"
+                (click)="selectUser(user)"
+                style="cursor: pointer;">
+              <td [class.border-4]="true"
+                  [class.border-success]="user.isActive"
+                  [class.border-danger]="!user.isActive">
+                {{ user.id }}
+              </td>
+              <td>{{ user.firstName }}</td>
+              <td>{{ user.lastName }}</td>
               <td>{{ user.email }}</td>
+              <td>{{ user.phone || 'N/A' }}</td>
               <td>
-                <span class="badge" [ngClass]="{
-                  'bg-primary': user.role === 'ADMIN',
-                  'bg-secondary': user.role !== 'ADMIN'
-                }">
-                  {{ user.role }}
+                <span class="badge" 
+                      [ngClass]="{
+                        'bg-primary': user.role === 'ADMIN',
+                        'bg-secondary': user.role === 'VICTIM'
+                      }">
+                  {{ user.role === 'ADMIN' ? 'Administrador' : 'Víctima' }}
                 </span>
               </td>
               <td>
-                <span class="badge" [ngClass]="{
-                  'bg-success': user.active,
-                  'bg-danger': !user.active
-                }">
-                  {{ user.active ? 'Activo' : 'Inactivo' }}
+                <span class="badge" [ngClass]="user.isActive ? 'bg-success' : 'bg-danger'">
+                  {{ user.isActive ? 'Activo' : 'Inactivo' }}
                 </span>
               </td>
               <td>
-                <div class="btn-group" role="group">
-                  <button class="btn btn-sm btn-outline-primary" (click)="editUser(user.id)">
+                <div class="btn-group" role="group" aria-label="Acciones de usuario">
+                  <button class="btn btn-sm btn-outline-primary" 
+                          (click)="editUser(user); $event.stopPropagation()"
+                          title="Editar usuario">
                     <i class="bi bi-pencil"></i>
                   </button>
-                  <button class="btn btn-sm btn-outline-danger ms-1" (click)="deleteUser(user.id)">
+                  <button class="btn btn-sm btn-outline-danger ms-1" 
+                          (click)="confirmDelete(user.id); $event.stopPropagation()"
+                          title="Eliminar usuario">
                     <i class="bi bi-trash"></i>
                   </button>
                 </div>
               </td>
             </tr>
-            <tr *ngIf="users.length === 0">
-              <td colspan="6" class="text-center">No hay usuarios registrados</td>
+            <tr *ngIf="filteredUsers.length === 0 && !isLoading">
+              <td colspan="8" class="text-center py-4">
+                No se encontraron usuarios que coincidan con los criterios de búsqueda
+              </td>
             </tr>
           </tbody>
         </table>

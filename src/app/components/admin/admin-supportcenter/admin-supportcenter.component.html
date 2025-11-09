@@ -207,33 +207,12 @@
   </div>
 </div>
 
-<!-- Toasts -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 2000">
-  <!-- Éxito -->
-  <div
-    *ngIf="successMessage"
-    class="toast align-items-center text-bg-success border-0 show fade-in"
-    role="alert"
-  >
-    <div class="d-flex">
-      <div class="toast-body">
-        <i class="bi bi-check-circle me-2"></i> {{ successMessage }}
-      </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="successMessage=''"></button>
-    </div>
-  </div>
-
-  <!-- Error -->
-  <div
-    *ngIf="errorMessage"
-    class="toast align-items-center text-bg-danger border-0 show fade-in"
-    role="alert"
-  >
-    <div class="d-flex">
-      <div class="toast-body">
-        <i class="bi bi-exclamation-triangle me-2"></i> {{ errorMessage }}
-      </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="errorMessage=''"></button>
-    </div>
-  </div>
-</div>
+<!-- Toast Notification -->
+<app-toast 
+  [message]="toastMessage" 
+  [type]="toastType" 
+  [show]="isToastVisible"
+  (closed)="onToastClosed()"
+  [autoClose]="true"
+  [autoCloseDelay]="5000">
+</app-toast>
