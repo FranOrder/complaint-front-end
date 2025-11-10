@@ -59,7 +59,9 @@ export const VIOLENCE_TYPE_LABELS: {[key: string]: string} = {
   'SEXUAL': 'Sexual',
   'ECONOMIC': 'Económica',
   'DIGITAL': 'Digital',
-  'OTHER': 'Otra'
+  'OTHER': 'Otra',
+  'HARASSMENT': 'Acoso',
+  'SOCIAL': 'Social'
 };
 export const RELATIONSHIP_LABELS: {[key: string]: string} = {
     

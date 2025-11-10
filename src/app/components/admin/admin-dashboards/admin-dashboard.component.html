@@ -1,93 +1,259 @@
 <nav class="navbar bg-light border-bottom">
-    <div class="container-fluid">
-        <span class="navbar-brand fw-bold ms-3"><img [src]="logoPath" alt="logo" style="width: 40px; height: 40px;" class="me-2">Red Segura</span>
-        <div class="d-flex align-items-center me-3" *ngIf="user">
-            <span class="me-3 d-none d-md-inline" style="color: #867ec9; font-weight: bold; font-size: 20px;">
-                {{ user.firstName }} {{ user.lastName || '' }}
-            </span>
-            <div class="dropdown" #userDropdown>
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-person-circle me-1"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                    <li><a class="dropdown-item text-danger" href="#" (click)="logout($event)">
-                        <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
-                    </a></li>
-                </ul>
-            </div>
-        </div>
+  <div class="container-fluid">
+    <span class="navbar-brand fw-bold ms-3">
+      <img [src]="logoPath" alt="logo" style="width: 40px; height: 40px;" class="me-2">
+      Red Segura
+    </span>
+
+    <div class="d-flex align-items-center me-3" *ngIf="user">
+      <span
+        class="me-3 d-none d-md-inline"
+        style="color: #867ec9; font-weight: bold; font-size: 20px;"
+      >
+        {{ user.firstName }} {{ user.lastName || '' }}
+      </span>
+
+      <div class="dropdown" #userDropdown>
+        <button
+          class="btn btn-outline-secondary dropdown-toggle"
+          type="button"
+          id="userDropdown"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          <i class="bi bi-person-circle me-1"></i>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+          <li>
+            <a
+              class="dropdown-item text-danger"
+              href="#"
+              (click)="logout($event)"
+            >
+              <i class="bi bi-box-arrow-right me-2"></i>
+              Cerrar sesión
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
+  </div>
 </nav>
 
 <div class="container-fluid">
-    <div class="row">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 sidebar d-none d-md-block">
+      <nav class="nav flex-column">
+        <a
+          class="nav-link"
+          [routerLink]="['/admin/dashboard']"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <i class="bi bi-house-door-fill me-2"></i> Dashboard
+        </a>
 
-        <div class="col-md-3 col-lg-2 sidebar d-none d-md-block">
+        <a
+          class="nav-link"
+          [routerLink]="['/admin/complaints']"
+          routerLinkActive="active"
+        >
+          <i class="bi bi-exclamation-triangle-fill me-2"></i> Denuncias
+        </a>
 
-            <nav class="nav flex-column">
-                <a class="nav-link" 
-                   [routerLink]="['/admin/dashboard']" 
-                   routerLinkActive="active" 
-                   [routerLinkActiveOptions]="{exact: true}">
-                    <i class="bi bi-house-door-fill me-2"></i> Dashboard
-                </a>
-                <a class="nav-link" 
-                   [routerLink]="['/admin/complaints']" 
-                   routerLinkActive="active">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Denuncias
-                </a>
-                <a class="nav-link" 
-                   [routerLink]="['/admin/users']" 
-                   routerLinkActive="active">
-                    <i class="bi bi-people-fill me-2"></i> Usuarios
-                </a>
-                <a class="nav-link" 
-                   [routerLink]="['/admin/reports']" 
-                   routerLinkActive="active">
-                    <i class="bi bi-file-text-fill me-2"></i> Reportes
-                </a>
-                <a class="nav-link" 
-                   [routerLink]="['/admin/support-centers']" 
-                   routerLinkActive="active">
-                    <i class="bi bi-hospital-fill me-2"></i> Centros de Ayuda
-                </a>
-            </nav>
+        <a
+          class="nav-link"
+          [routerLink]="['/admin/users']"
+          routerLinkActive="active"
+        >
+          <i class="bi bi-people-fill me-2"></i> Usuarios
+        </a>
+
+        <a
+          class="nav-link"
+          [routerLink]="['/admin/reports']"
+          routerLinkActive="active"
+        >
+          <i class="bi bi-file-text-fill me-2"></i> Reportes
+        </a>
+
+        <a
+          class="nav-link"
+          [routerLink]="['/admin/support-centers']"
+          routerLinkActive="active"
+        >
+          <i class="bi bi-hospital-fill me-2"></i> Centros de Ayuda
+        </a>
+      </nav>
+    </div>
+
+    <!-- Contenido principal -->
+    <main
+      class="col-md-9 col-lg-10 ms-sm-auto px-md-4 py-4"
+      style="background-color: var(--bs-primary-light);"
+    >
+      <!-- Dashboard -->
+      <div *ngIf="showDashboard()">
+        <div
+          class="welcome-header p-4 d-flex flex-column flex-md-row justify-content-between align-items-center lh-lg"
+        >
+          <div>
+            <h2 class="fw-bold mb-2">
+              Bienvenido {{ user.firstName }}. Estás en el panel de administración.
+            </h2>
+            <p class="mb-0" style="font-size: 18px;">
+              Aquí puedes gestionar denuncias, usuarios y generar reportes para
+              supervisión y análisis.
+            </p>
+            <small class="d-block mt-2 fst-italic">
+              <i class="bi bi-lock-fill"></i>
+              Todo el sistema está protegido y solo accesible a administradores.
+            </small>
+          </div>
         </div>
 
-        <main class="col-md-9 col-lg-10 ms-sm-auto px-md-4 py-4" style="background-color: var(--bs-primary-light);">
-            <!-- Contenido del dashboard -->
-            <div *ngIf="showDashboard()">
-                <div class="welcome-header p-4 d-flex flex-column flex-md-row justify-content-between align-items-center lh-lg">
-                    <div>
-                        <h2 class="fw-bold mb-2">Bienvenido {{ user.firstName }}. Estás en el panel de administración. </h2>
-                        <p class="mb-0" style="font-size: 18px;">quí puedes gestionar denuncias, usuarios y generar reportes para supervisión y análisis.</p>
-                        <small class="d-block mt-2 fst-italic"><i class="bi bi-lock-fill"></i>  Todo el sistema está protegido y solo accesible a administradores.</small>
-                    </div>
+        <!-- Estadísticas rápidas -->
+        <div class="row">
+          <div class="col-12">
+            <div class="card">
+              <div
+                class="card-header d-flex justify-content-between align-items-center"
+              >
+                <h5 class="mb-0">Estadísticas Rápidas</h5> 
+              </div> 
+              <div class="card-body"> 
+                <div class="row text-center"> 
+                  <div class="col-md-3 mb-3 mb-md-0"> 
+                    <div class="p-3 border rounded"> 
+                      <h3 class="text-primary">{{ totalComplaints }}</h3> 
+                    <p class="mb-0 text-muted">Denuncias Totales</p> 
+                  </div> 
+                </div> 
+                <div class="col-md-3 mb-3 mb-md-0"> 
+                  <div class="p-3 border rounded"> 
+                    <h3 class="text-success">{{ resolvedPercentage }}%</h3> 
+                    <p class="mb-0 text-muted">Resueltas</p> 
+                  </div> 
+                </div> 
+                <div class="col-md-3 mb-3 mb-md-0"> 
+                  <div class="p-3 border rounded"> 
+                    <h3 class="text-warning">{{ averageResolutionTime }} dias</h3> 
+                    <p class="mb-0 text-muted">Tiempo Promedio de Resolución</p> 
+                  </div> 
+                </div> 
+                <div class="col-md-3"> 
+                  <div class="p-3 border rounded"> 
+                    <h3 class="text-info">{{ mostCommonViolenceType || 'N/A' }}</h3> 
+                    <p class="mb-0 text-muted">Tipo de Violencia Más Común</p> 
+                  </div>
                 </div>
-
-                <div class="row g-4 mb-4">
-                    <div class="col-md-6">
-                       
-                    </div>
-
-                    <div class="col-md-6">
-                        
-                    </div>
-                </div>
-
-
-
-                <footer class="d-flex justify-content-between text-secondary mt-5 pt-3 border-top">
-                    <small>© 2025 Red Segura</small>
-                    <div>
-                        <small class="me-3">Política de privacidad</small>
-                        <small>Aviso legal</small>
-                    </div>
-                </footer>
+              </div>
             </div>
-            
-            <!-- Aquí se cargarán los componentes de las rutas -->
-            <router-outlet></router-outlet>
-        </main>
+          </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header">
+                <h5 class="card-title mb-0">Distribución de Denuncias por Tipo</h5>
+              </div>
+              <div class="card-body">
+                <div
+                  class="chart-container"
+                  style="position: relative; height: 300px;"
+                >
+                  <canvas
+                    baseChart
+                    [data]="barChartData"
+                    [options]="barChartOptions"
+                    [type]="barChartType"
+                  >
+                  </canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-header">
+                <h5 class="card-title mb-0">Estado de Denuncias</h5>
+              </div>
+              <div class="card-body d-flex justify-content-center">
+                <div style="width: 80%; max-width: 300px;">
+                  <canvas
+                    baseChart
+                    [data]="pieChartData"
+                    [options]="pieChartOptions"
+                    [type]="pieChartType"
+                  >
+                  </canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+       
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Tendencia de Denuncias (últimos meses)</h5>
+        </div>
+        <div class="card-body">
+          <div
+            class="chart-container"
+            style="position: relative; height: 350px;"
+          >
+            <canvas
+              baseChart
+              [data]="lineChartData"
+              [options]="lineChartOptions"
+              [type]="lineChartType"
+            ></canvas>
+          </div>
+        </div>
+      </div>
     </div>
+        
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-start border-primary border-4">
+      <div class="card-body d-flex justify-content-between align-items-center">
+        <div>
+          <h5 class="mb-1">Crecimiento Mensual</h5>
+          <p class="text-muted mb-0">Comparado con el mes anterior</p>
+          <small class="text-muted">
+            <!-- mostramos las cantidades -->
+            {{ currentMonthCount }} este mes • {{ previousMonthCount }} el mes anterior
+          </small>
+        </div>
+        <h4 [class.text-success]="monthlyGrowth >= 0" [class.text-danger]="monthlyGrowth < 0">
+          {{ monthlyGrowth >= 0 ? '+' : ''}}{{ monthlyGrowth }}%
+        </h4>
+      </div>
+    </div>
+  </div>
+</div>
+        <!-- Footer -->
+        <footer
+          class="d-flex justify-content-between text-secondary mt-5 pt-3 border-top"
+        >
+          <small>© 2025 Red Segura</small>
+          <div>
+            <small class="me-3">Política de privacidad</small>
+            <small>Aviso legal</small>
+          </div>
+        </footer>
+      </div>
+    </div>
+
+      <!-- Carga de componentes dinámicos -->
+      <router-outlet></router-outlet>
+    </main>
+  </div>
 </div>
