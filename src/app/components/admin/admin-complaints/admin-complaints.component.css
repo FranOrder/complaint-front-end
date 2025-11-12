@@ -116,21 +116,7 @@
  text-transform: uppercase;
 }
 
-.badge.in-review {
- background-color: #e6daf5; 
- color: #8367bf; 
- border: 1px solid #8367bf; 
-}
 
-.badge.action-taken {
- background-color: #b497bd; 
- color: white;
-}
-
-.badge.closed {
- background-color: #d4edda; 
- color: #155724;
-}
 
 /* 🟣 Avatar */
 .avatar-sm {

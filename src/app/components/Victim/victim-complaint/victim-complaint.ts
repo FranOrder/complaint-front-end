@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../../../services/auth.service';
 
@@ -30,7 +30,7 @@ function notFutureDate(control: AbstractControl): ValidationErrors | null {
     ReactiveFormsModule, 
     HttpClientModule,
     RouterLink,
-    RouterLinkActive
+  
   ],
   templateUrl: './victim-complaint.html',
   styleUrls: ['./victim-complaint.css']

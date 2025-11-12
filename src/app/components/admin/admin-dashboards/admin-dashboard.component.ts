@@ -8,7 +8,9 @@ import { Subscription, forkJoin } from 'rxjs';
 import { NgbDropdownModule, NgbProgressbarModule } from '@ng-bootstrap/ng-bootstrap';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 import { NgChartsModule } from 'ng2-charts';
+
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -20,7 +22,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
     RouterOutlet,
     NgbDropdownModule,
     NgbProgressbarModule,
-    NgChartsModule
+    NgChartsModule  
   ],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
@@ -89,14 +91,15 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     }
   };
 
-  constructor(
-    private authService: AuthService,
-    private analyticsService: AnalyticsService,
-    public router: Router
-  ) {
-    Chart.register(...registerables, ChartDataLabels);
-    this.routeSubscription = this.router.events.subscribe(() => {});
-  }
+constructor(
+  private authService: AuthService,
+  private analyticsService: AnalyticsService,
+  public router: Router
+) {
+  Chart.register(...registerables);
+  Chart.register(ChartDataLabels);
+  this.routeSubscription = this.router.events.subscribe(() => {});
+}
 
   ngOnInit(): void {
     const userInfo = this.authService.getUserInfo();
@@ -196,7 +199,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       datasets: [
         {
           data: values,
-          backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#dc3545', '#6f42c1']
+          backgroundColor: ['#5588b8ff', '#dfc87fff', '#71c98bff', '#8ce7eeff']
         }
       ]
     };
@@ -220,7 +223,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
         {
           label: 'Número de denuncias',
           data: values,
-          backgroundColor: '#36A2EB'
+          backgroundColor: '#b497bd'
         }
       ]
     };

@@ -26,12 +26,29 @@
     margin-bottom: 20px;
 }
 
+
 .card {
-    background-color: #faf7ff;
+ border: none;
+ box-shadow: 0 4px 8px #8367bf5b; 
+ 
+ border-radius: 15px; 
+ background-color: white;
     padding: 20px;
-    border-radius: 15px;
     margin-bottom: 20px;
+
 }
+
+.card-header {
+  background-color: #faf7ff;
+ color: #8367bf; 
+ font-weight: 700;
+ font-size: 1.05rem; 
+ border-bottom: 2px solid #8367bf; 
+ border-radius: 15px 15px 0 0; 
+ padding: 1rem 1.5rem;
+}
+
+
 
 .btn {
     background-color: #faf7ff;

@@ -4,65 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-
-// Mapeo de distritos a sus zonas
-export const DISTRICT_ZONES: {[key: string]: string} = {
-  'LIMA': 'Lima Centro',
-  'BREÑA': 'Lima Centro',
-  'LA_VICTORIA': 'Lima Centro',
-  'RIMAC': 'Lima Centro',
-  'CARABAYLLO': 'Lima Norte',
-  'COMAS': 'Lima Norte',
-  'INDEPENDENCIA': 'Lima Norte',
-  'LOS_OLIVOS': 'Lima Norte',
-  'PUENTE_PIEDRA': 'Lima Norte',
-  'SAN_MARTIN_DE_PORRES': 'Lima Norte',
-  'ATE': 'Lima Este',
-  'CIENEGUILLA': 'Lima Este',
-  'EL_AGUSTINO': 'Lima Este',
-  'SAN_JUAN_DE_LURIGANCHO': 'Lima Este',
-  'SAN_LUIS': 'Lima Este',
-  'SANTA_ANITA': 'Lima Este',
-  'BARRANCO': 'Lima Sur',
-  'CHORRILLOS': 'Lima Sur',
-  'PACHACAMAC': 'Lima Sur',
-  'PUNTA_HERMOSA': 'Lima Sur',
-  'PUNTA_NEGRA': 'Lima Sur',
-  'SAN_JUAN_DE_MIRAFLORES': 'Lima Sur',
-  'VILLA_EL_SALVADOR': 'Lima Sur',
-  'VILLA_MARIA_DEL_TRIUNFO': 'Lima Sur',
-  'JESUS_MARIA': 'Lima Moderna',
-  'LINCE': 'Lima Moderna',
-  'MAGDALENA_DEL_MAR': 'Lima Moderna',
-  'MIRAFLORES': 'Lima Moderna',
-  'PUEBLO_LIBRE': 'Lima Moderna',
-  'SAN_BORJA': 'Lima Moderna',
-  'SAN_ISIDRO': 'Lima Moderna',
-  'SAN_MIGUEL': 'Lima Moderna',
-  'SANTIAGO_DE_SURCO': 'Lima Moderna',
-  'SURQUILLO': 'Lima Moderna',
-  'CALLAO': 'Callao'
-};
-
-type District = keyof typeof DISTRICT_ZONES;
-
-interface SupportCenter {
-  id: number;
-  name: string;
-  street: string;
-  district: District;
-  phone: string;
-  email: string;
-  schedule: string;
-  is_active: boolean;
-  description?: string; // Agregando la propiedad description opcional
-  zone?: string; // Agregamos la propiedad zone opcional
-}
+import { SupportCenter, DISTRICT_ZONES, SupportCenterResponse } from '../../../models/support-center.model';
 
 @Component({
   selector: 'app-victim-map',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ],
   templateUrl: './victim-map.html',
   styleUrls: ['./victim-map.css']
 })
@@ -70,6 +17,8 @@ export class VictimMapComponent implements OnInit {
   supportCenters: SupportCenter[] = [];
   filteredCenters: SupportCenter[] = [];
   selectedCenter: SupportCenter | null = null;
+   isLoading = false;
+  
   
   // Filtros
   zones: string[] = ['Todas las zonas', 'Lima Centro', 'Lima Norte', 'Lima Este', 'Lima Sur', 'Lima Moderna', 'Callao'];
@@ -85,30 +34,53 @@ export class VictimMapComponent implements OnInit {
   ngOnInit(): void {
     this.loadSupportCenters();
   }
-  
-  loadSupportCenters() {
-    this.http.get<SupportCenter[]>(`${environment.apiUrl}/support-centers`).subscribe({
+    private mapToSupportCenter(response: SupportCenterResponse): SupportCenter {
+    return {
+      id: response.id,
+      name: response.name,
+      street: response.street,
+      district: response.district,
+      phone: response.phone,
+      email: response.email,
+      schedule: response.schedule,
+      isActive: response.active || response.isActive || false,
+      createdAt: response.createdAt,
+      updatedAt: response.updatedAt
+    };
+  }
+  loadSupportCenters(): void {
+    this.isLoading = true;
+    
+    this.http.get<SupportCenterResponse[]>(`${environment.apiUrl}/support-centers`).subscribe({
       next: (data) => {
         console.log('Datos recibidos del backend:', JSON.stringify(data, null, 2));
-        this.supportCenters = data;
+        
+        // Mapear de SupportCenterResponse a SupportCenter
+        this.supportCenters = data
+          .filter(center => center.active === true || center.isActive === true)
+          .map(center => this.mapToSupportCenter(center));
+        
+        console.log('Centros activos mapeados:', JSON.stringify(this.supportCenters, null, 2));
+        
         this.filteredCenters = [...this.supportCenters];
         this.updateFilters();
         
-        // Select first center by default if available
+        // Seleccionar el primer centro activo si está disponible
         if (this.filteredCenters.length > 0) {
-          console.log('Primer centro:', JSON.stringify(this.filteredCenters[0], null, 2));
           this.selectCenter(this.filteredCenters[0]);
         }
+        
+        this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading support centers:', error);
+        console.error('Error al cargar los centros de apoyo:', error);
         if (error.status === 403) {
-          console.error('Access forbidden. Please check your authentication.');
+          console.error('Acceso denegado. Por favor, verifica tu autenticación.');
         }
+        this.isLoading = false;
       }
     });
   }
-
   updateFilters(): void {
     // Actualizamos los distritos basados en la zona seleccionada
     if (this.selectedZone === 'Todas las zonas') {

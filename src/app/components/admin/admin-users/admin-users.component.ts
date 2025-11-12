@@ -162,32 +162,7 @@ loadUsers(): void {
     });
   }
 
-  toggleUserStatus(user: UserResponse): void {
-    if (!confirm(`¿Está seguro de ${user.isActive ? 'desactivar' : 'activar'} este usuario?`)) {
-      return;
-    }
 
-    this.isLoading = true;
-    const updateData: UpdateProfileRequest = {
-      firstName: user.firstName,
-      lastName: user.lastName,
-      phone: user.phone,
-      isActive: !user.isActive
-    };
-
-    this.userService.updateProfile(user.id, updateData).subscribe({
-      next: () => {
-        user.isActive = !user.isActive;
-        this.showSuccess(`Usuario ${user.isActive ? 'activado' : 'desactivado'} correctamente`);
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error toggling user status:', error);
-        this.showError('Error al cambiar el estado del usuario');
-        this.isLoading = false;
-      }
-    });
-  }
 
   // Validation
   validateForm(user: Partial<CreateUserRequest>): boolean {
@@ -230,13 +205,7 @@ applyFilters(): void {
       user.lastName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(this.searchTerm.toLowerCase());
 
-    const matchesRole = !this.selectedRoleFilter || 
-      user.role === this.selectedRoleFilter;
 
-    const matchesStatus = this.activeStatusFilter === '' || 
-      user.isActive === this.activeStatusFilter;
-
-    return matchesSearch && matchesRole && matchesStatus;
   });
 }
 
@@ -260,7 +229,7 @@ applyFilters(): void {
       phone: '',
       password: '',
       role: 'VICTIM',
-      isActive: true
+
     };
   }
 

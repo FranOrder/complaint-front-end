@@ -38,11 +38,11 @@
                    routerLinkActive="active">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i> Denunciar
                 </a>
-                <a class="nav-link" 
+              <!-- <a class="nav-link" 
                    [routerLink]="['/victim/chat']" 
                    routerLinkActive="active">
-                    <i class="bi bi-chat-dots-fill me-2"></i> Chat
-                </a>
+                    <i class="bi bi-chat-fill me-2"></i> Chat
+                </a> -->
                 <a class="nav-link" 
                    [routerLink]="['/victim/map']" 
                    routerLinkActive="active">
@@ -76,9 +76,6 @@
                             <h5 class="ms-4 fw-bold">Accesos rápidos</h5>
                             <br>
                             <div class="ms-4 d-flex flex-wrap gap-4">
-                                <button class="btn btn-outline-secondary" type="button" [routerLink]="['/victim/chat']">
-                                    <i class="bi bi-chat-dots-fill"></i> Chat y contacto
-                                </button>
                                 <button class="btn btn-outline-secondary" type="button" [routerLink]="['/victim/map']">
                                     <i class="bi bi-map-fill"></i> Mapa de ayuda
                                 </button>

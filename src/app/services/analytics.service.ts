@@ -171,6 +171,7 @@ export class AnalyticsService {
     return date.toISOString().split('T')[0];
   }
 
+
   // Calculate month-over-month growth
   calculateMonthlyGrowth(currentMonth: number, previousMonth: number): number {
     if (previousMonth === 0) return currentMonth > 0 ? 100 : 0;

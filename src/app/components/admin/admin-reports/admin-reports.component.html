@@ -1,0 +1,192 @@
+<!-- admin-reports.component.html -->
+<div class="container-fluid py-4">
+  <div class="card mb-4">
+    <div class="card-header">
+      <h5 class="mb-0">Filtros Avanzados</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <label class="form-label">Fecha Inicio</label>
+            <input type="date" class="form-control" formControlName="startDate">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Fecha Fin</label>
+            <input type="date" class="form-control" formControlName="endDate">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Tipo de Violencia</label>
+            <select class="form-select" formControlName="violenceType">
+              <option value="">Todos</option>
+              <option *ngFor="let type of ['PHYSICAL', 'PSYCHOLOGICAL', 'SEXUAL', 'ECONOMIC', 'DIGITAL', 'OTHER']" 
+                      [value]="type">
+                {{ getViolenceTypeLabel(type) }}
+              </option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Estado</label>
+            <select class="form-select" formControlName="status">
+              <option value="">Todos</option>
+              <option *ngFor="let status of ['RECEIVED', 'IN_REVIEW', 'ACTION_TAKEN', 'CLOSED']" 
+                      [value]="status">
+                {{ getStatusLabel(status) }}
+              </option>
+            </select>
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary me-2" [disabled]="isLoading">
+              <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1"></span>
+              Aplicar Filtros
+            </button>
+            <button type="button" class="btn btn-secondary me-2" (click)="resetFilters()">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+            <button type="button" class="btn btn-outline-secondary" (click)="exportToExcel()">
+              <i class="bi bi-file-earmark-excel me-1"></i> Exportar Excel
+            </button>
+            <button type="button" class="btn btn-outline-secondary ms-2" (click)="exportToPDF()">
+              <i class="bi bi-file-earmark-pdf me-1"></i> Exportar PDF
+            </button>
+            <button type="button" class="btn btn-outline-secondary ms-2" (click)="exportToCSV()">
+              <i class="bi bi-filetype-csv me-1"></i> Exportar CSV
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-header">
+          <h6 class="mb-0">Distribución por Estado</h6>
+        </div>
+        <div class="card-body">
+          <div style="height: 300px;">
+            <canvas baseChart
+              [data]="statusChartData"
+              type="pie"
+              [options]="{ responsive: true, maintainAspectRatio: false }">
+            </canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card h-100">
+        <div class="card-header">
+          <h6 class="mb-0">Tendencia de Denuncias</h6>
+        </div>
+        <div class="card-body">
+          <div style="height: 300px;">
+            <canvas baseChart
+              [data]="trendChartData"
+              type="line"
+              [options]="{ 
+                responsive: true, 
+                maintainAspectRatio: false,
+                scales: {
+                  y: { beginAtZero: true, ticks: { precision: 0 } }
+                }
+              }">
+            </canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+<div class="card">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Reporte Detallado</h5>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th (click)="sortData('id')" style="cursor: pointer;">
+            ID
+            <i class="fas fa-sort ms-1"></i>
+          </th>
+          <th (click)="sortData('type')" style="cursor: pointer;">
+            Tipo
+            <i class="fas fa-sort ms-1"></i>
+          </th>
+          <th (click)="sortData('status')" style="cursor: pointer;">
+            Estado
+            <i class="fas fa-sort ms-1"></i>
+          </th>
+          <th (click)="sortData('createdAt')" style="cursor: pointer;">
+            Fecha Creación
+            <i class="fas fa-sort ms-1"></i>
+          </th>
+          <th (click)="sortData('updatedAt')" style="cursor: pointer;">
+            Última Actualización
+            <i class="fas fa-sort ms-1"></i>
+          </th>
+          <th (click)="sortData('resolutionTime')" style="cursor: pointer;">
+            Tiempo Resolución
+            <i class="fas fa-sort ms-1"></i>
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+    <tr *ngFor="let complaint of paginatedItems">
+  <td>{{ complaint.id }}</td>
+  <td>{{ getViolenceTypeLabel(complaint.violenceType) }}</td>
+  <td>
+    <span class="badge" [ngClass]="getStatusBadgeClass(complaint.status)">
+      {{ getStatusLabel(complaint.status) }}
+    </span>
+  </td>
+  <td>{{ formatDate(complaint.createdAt) }}</td>
+  <td>{{ formatDate(complaint.updatedAt) }}</td>
+  <td>{{ calculateResolutionTime(complaint) }}</td>
+</tr>
+        <tr *ngIf="filteredComplaints.length === 0">
+          <td colspan="7" class="text-center py-4">No se encontraron registros</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card-footer d-flex justify-content-between align-items-center">
+    <div class="text-muted">
+      Mostrar 
+      <select class="form-select form-select-sm d-inline-block w-auto" [(ngModel)]="itemsPerPage">
+        <option [value]="10">10</option>
+        <option [value]="25">25</option>
+        <option [value]="50">50</option>
+        <option [value]="100">100</option>
+      </select> 
+      registros por página
+    </div>
+
+    <nav>
+      <ul class="pagination mb-0">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" (click)="changePage(currentPage - 1)" style="cursor: pointer;">Anterior</a>
+        </li>
+
+        <li *ngFor="let page of [].constructor(totalPages); let i = index"
+            class="page-item"
+            [class.active]="currentPage === i + 1">
+          <a class="page-link" (click)="changePage(i + 1)" style="cursor: pointer;">{{ i + 1 }}</a>
+        </li>
+
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" (click)="changePage(currentPage + 1)" style="cursor: pointer;">Siguiente</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+</div>

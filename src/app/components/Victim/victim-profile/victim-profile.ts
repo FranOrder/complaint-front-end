@@ -30,20 +30,13 @@ export class VictimProfileComponent implements OnInit {
   success: string | null = null;
   
 user: UserProfile = {
-  id: 0,
-  firstName: '',
-  lastName: '',
-  email: '',
-  phone: '',
-  role: 'VICTIM' as const,
-  isActive: true,
-  createdAt: '',
-  updatedAt: ''
+
+fullName: '',
+email: '',
+phone: '',
+role: 'VICTIM' as const,
 };
 
-  get fullName(): string {
-    return this.user ? `${this.user.firstName} ${this.user.lastName}`.trim() : '';
-  }
   phoneForm!: FormGroup;
 
   constructor(
@@ -68,21 +61,11 @@ private loadUserProfile(): void {
     next: (profile: any) => {
       console.log('Respuesta del perfil:', profile);
 
-      // 👇 Descomponer el fullName en firstName y lastName
-      const [firstName, ...rest] = (profile.fullName || '').split(' ');
-      const lastName = rest.join(' ');
-
-      // 👇 Reasignar correctamente al modelo UserProfile
       this.user = {
-        id: profile.id || 0,
-        firstName: firstName || '',
-        lastName: lastName || '',
+        fullName: profile.fullName || '',
         email: profile.email,
         phone: profile.phone,
         role: profile.role,
-        isActive: profile.isActive !== undefined ? profile.isActive : true,
-        createdAt: profile.createdAt || '',
-        updatedAt: profile.updatedAt || ''
       };
 
       this.phoneForm.patchValue({ phone: this.user.phone });
@@ -171,8 +154,8 @@ onUpdatePhone(): void {
   this.success = null;
 
   // Use the existing user's first and last name, or 'Desconocido' if they're not set
-  const firstName = this.user.firstName?.trim() || 'Desconocido';
-  const lastName = this.user.lastName?.trim() || 'Desconocido';
+ const [firstName, ...rest] = (this.user.fullName || '').split(' ');
+  const lastName = rest.join(' ') || 'Desconocido';
 
   const updateData = {
     firstName,
