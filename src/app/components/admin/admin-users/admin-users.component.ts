@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
 import { UserService } from '../../../services/user.service';
-import { UserResponse, UserRole, UserFilters } from '../../../models/user.model';
+import { UserResponse, UserRole, UserFilters, CreateUserRequest, UpdateProfileRequest } from '../../../models/user.model';
 import { ToastComponent } from '../../../shared/components/toast/toast.component';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,6 +19,14 @@ export class AdminUsersComponent implements OnInit {
   users: UserResponse[] = [];
   filteredUsers: UserResponse[] = [];
   selectedUser: UserResponse | null = null;
+  newAdmin: Omit<CreateUserRequest, 'role'> = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: ''
+  };
+  isCreatingAdmin = false;
   
   // Pagination
   currentPage = 1;
@@ -57,7 +65,6 @@ export class AdminUsersComponent implements OnInit {
     this.loadUsers();
   }
 
-  // Data Loading
   private loadUsers(): void {
     this.isLoading = true;
     const formValue = this.searchForm.value;
@@ -103,21 +110,18 @@ export class AdminUsersComponent implements OnInit {
 
 
   onFilterClick(): void {
-    this.currentPage = 1; // Reset to first page when filters change
+    this.currentPage = 1;
     this.loadUsers();
   }
 
-  // Filtering
   applyFilters(): void {
     const formValue = this.searchForm.value;
     let filtered = [...this.users];
     
-    // Filter by role if selected
     if (formValue.role) {
       filtered = filtered.filter(u => u.role === formValue.role);
     }
     
-    // Filter by search term if provided
     if (formValue.searchTerm) {
       const term = formValue.searchTerm.toLowerCase().trim();
       filtered = this.filterBySearchTerm(filtered, term);
@@ -151,7 +155,6 @@ export class AdminUsersComponent implements OnInit {
     return Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
   }
 
-  // User Selection
   selectUser(user: UserResponse): void {
     this.selectedUser = this.selectedUser?.id === user.id ? null : user;
   }
@@ -160,11 +163,81 @@ export class AdminUsersComponent implements OnInit {
     return this.selectedUser?.id === userId;
   }
 
-  // Form Actions
   onAddNew(): void {
-    this.selectedUser = null;
-    this.isEditing = false;
+    this.isCreatingAdmin = true;
+    this.newAdmin = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      password: ''
+    };
+  }
+
+  onEditUser(user: UserResponse): void {
+    this.selectedUser = { ...user };
     this.isFormVisible = true;
+  }
+
+  onUpdateProfile(): void {
+    if (!this.selectedUser) return;
+
+    const updateData: UpdateProfileRequest = {
+      firstName: this.selectedUser.firstName,
+      lastName: this.selectedUser.lastName,
+      phone: this.selectedUser.phone
+    };
+
+    this.isLoading = true;
+    this.userService.updateUserProfile(this.selectedUser.id, updateData)
+      .pipe(finalize(() => this.isLoading = false))
+      .subscribe({
+        next: (response) => {
+          const index = this.users.findIndex(u => u.id === this.selectedUser?.id);
+          if (index !== -1 && this.selectedUser) {
+            this.users[index] = { 
+              ...this.users[index],
+              firstName: updateData.firstName,
+              lastName: updateData.lastName,
+              phone: updateData.phone,
+              updatedAt: new Date().toISOString() 
+            };
+            this.filteredUsers = [...this.users];
+          }
+          this.showSuccess('Perfil actualizado exitosamente');
+          this.cancelEdit();
+        },
+        error: (error) => {
+          console.error('Error updating profile:', error);
+          this.showError('Error al actualizar el perfil');
+        }
+      });
+  }
+
+  onCreateAdmin(): void {
+    if (!this.newAdmin.firstName || !this.newAdmin.lastName || !this.newAdmin.email || !this.newAdmin.password) {
+      this.showError('Por favor complete todos los campos requeridos');
+      return;
+    }
+
+    this.isLoading = true;
+    this.userService.createAdmin(this.newAdmin).pipe(
+      finalize(() => this.isLoading = false)
+    ).subscribe({
+      next: () => {
+        this.showSuccess('Administrador creado exitosamente');
+        this.isCreatingAdmin = false;
+        this.loadUsers();
+      },
+      error: (error) => {
+        console.error('Error creating admin:', error);
+        this.showError('Error al crear el administrador');
+      }
+    });
+  }
+
+  cancelCreateAdmin(): void {
+    this.isCreatingAdmin = false;
   }
 
   onEdit(): void {
@@ -173,39 +246,10 @@ export class AdminUsersComponent implements OnInit {
     this.isFormVisible = true;
   }
 
-  // User Management
-  createUser(userData: any): void {
-    this.isLoading = true;
-    this.userService.createUser({
-      ...userData,
-      role: 'ADMIN' // Force ADMIN role as per business rule
-    } as any)
-    .pipe(finalize(() => this.isLoading = false))
-    .subscribe({
-      next: () => {
-        this.showSuccess('Usuario administrador creado correctamente');
-        this.loadUsers();
-        this.cancelEdit();
-      },
-      error: (error) => this.showError('Error al crear el usuario administrador')
-    });
-  }
-
-
-
   cancelEdit(): void {
     this.isFormVisible = false;
     this.isEditing = false;
     this.selectedUser = null;
-  }
-
-  // UI Helpers
-  private showSuccess(message: string): void {
-    this.showToastMessage(message, 'success');
-  }
-
-  private showError(message: string): void {
-    this.showToastMessage(message, 'danger');
   }
 
   private showToastMessage(message: string, type: 'success' | 'danger' | 'warning' | 'info'): void {
@@ -218,17 +262,21 @@ export class AdminUsersComponent implements OnInit {
     }, 5000);
   }
 
-  // Track by function for ngFor
+  showSuccess(message: string): void {
+    this.showToastMessage(message, 'success');
+  }
+
+  showError(message: string): void {
+    this.showToastMessage(message, 'danger');
+  }
+
   trackById(index: number, item: UserResponse): number {
     return item.id;
   }
-
-  // Get user full name
   getFullName(user: UserResponse): string {
     return `${user.firstName} ${user.lastName}`.trim();
   }
 
-  // Get role label
   getRoleLabel(role: UserRole): string {
     return role === 'ADMIN' ? 'Administrador' : 'Víctima';
   }

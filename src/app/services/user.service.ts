@@ -24,6 +24,14 @@ export class UserService {
     });
   }
 
+  updateUserProfile(userId: number, profileData: UpdateProfileRequest): Observable<UserProfile> {
+    return this.http.put<UserProfile>(
+      `${this.apiUrl}/${userId}`,
+      profileData,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
   updatePhone(userId: number, phoneData: { phone: string }): Observable<UserProfile> {
     return this.http.patch<UserProfile>(
       `${this.apiUrl}/${userId}`,
@@ -39,15 +47,29 @@ export class UserService {
   }
 
 
+  createAdmin(adminData: Omit<CreateUserRequest, 'role'>): Observable<UserResponse> {
+    // Set role to ADMIN by default
+    const adminRequest: CreateUserRequest = {
+      ...adminData,
+      role: 'ADMIN'
+    };
+    
+    return this.http.post<UserResponse>(
+      `${this.apiUrl}/admin`, 
+      adminRequest,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
   getCurrentUserId(): number | null {
-  const userData = localStorage.getItem('user');
-  if (!userData) return null;
-  
-  try {
-    const user = JSON.parse(userData);
-    return user.id || null;
-  } catch {
-    return null;
+    const userData = localStorage.getItem('user');
+    if (!userData) return null;
+    
+    try {
+      const user = JSON.parse(userData);
+      return user.id || null;
+    } catch {
+      return null;
   }
 }
 
@@ -61,25 +83,6 @@ getAllUsers(role?: string): Observable<UserResponse[]> {
   return this.http.get<UserResponse[]>(`${this.apiUrl}`, { params });
 }
 
- createUser(userData: CreateUserRequest): Observable<UserResponse> {
-    return this.http.post<UserResponse>(`${this.apiUrl}/admin`, userData, {
-      headers: this.getAuthHeaders()
-    });
-  }
-
-  updateUser(id: number, userData: UpdateProfileRequest): Observable<UserResponse> {
-    return this.http.put<UserResponse>(
-      `${this.apiUrl}/${id}`,
-      userData,
-      { headers: this.getAuthHeaders() }
-    );
-  }
-
-  deleteUser(userId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${userId}`, {
-      headers: this.getAuthHeaders()
-    });
-  }
 
 
 

@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule,FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { AnalyticsService } from '../../../services/analytics.service';
 import { ComplaintService } from '../../../services/complaint.service';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { ChartData } from 'chart.js';
 import { STATUS_LABELS, VIOLENCE_TYPE_LABELS } from '../../../models/complaint.model';
 
 import { BaseChartDirective, NgChartsModule } from 'ng2-charts';
@@ -79,14 +79,13 @@ export class AdminReportsComponent implements OnInit {
   this.isLoading = true;
   const endDate = new Date();
   const startDate = new Date();
-  startDate.setMonth(endDate.getMonth() - 1); // Default to last month
+  startDate.setMonth(endDate.getMonth() - 1); 
   
   this.filtersForm.patchValue({
     startDate: startDate.toISOString().split('T')[0],
     endDate: endDate.toISOString().split('T')[0]
   });
-  
-  // Fetch complaints data
+
   this.complaintService.getAllComplaints().pipe(
     finalize(() => this.isLoading = false)
   ).subscribe({
@@ -107,7 +106,6 @@ export class AdminReportsComponent implements OnInit {
   const filters = this.filtersForm.value;
 
   this.filteredComplaints = this.complaints.filter((complaint: any) => {
-    // ✅ 1. Filtrar por rango de fechas
     const complaintDate = new Date(
       complaint.incidentDate || complaint.createdAt
     );
@@ -119,11 +117,10 @@ export class AdminReportsComponent implements OnInit {
 
     if (filters.endDate) {
       const endDate = new Date(filters.endDate);
-      endDate.setHours(23, 59, 59, 999); // incluir todo el día
+      endDate.setHours(23, 59, 59, 999); 
       if (complaintDate > endDate) return false;
     }
 
-    // ✅ 2. Filtrar por tipo de violencia (usa violenceType)
     if (
       filters.violenceType &&
       complaint.violenceType?.toUpperCase() !== filters.violenceType.toUpperCase()
@@ -131,7 +128,6 @@ export class AdminReportsComponent implements OnInit {
       return false;
     }
 
-    // ✅ 3. Filtrar por estado
     if (
       filters.status &&
       complaint.status?.toUpperCase() !== filters.status.toUpperCase()
@@ -149,7 +145,6 @@ export class AdminReportsComponent implements OnInit {
 
 
   private updateCharts(): void {
-    // Update status chart
     const statusCounts = this.filteredComplaints.reduce((acc, complaint) => {
       acc[complaint.status] = (acc[complaint.status] || 0) + 1;
       return acc;
@@ -163,7 +158,6 @@ export class AdminReportsComponent implements OnInit {
       }]
     };
 
-    // Update trend chart (group by day)
     const trendData = this.filteredComplaints.reduce((acc, complaint) => {
       const date = new Date(complaint.createdAt).toISOString().split('T')[0];
       acc[date] = (acc[date] || 0) + 1;
@@ -187,7 +181,6 @@ export class AdminReportsComponent implements OnInit {
     }
   }
 
-  // Sorting
   sortData(column: string): void {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -210,7 +203,7 @@ export class AdminReportsComponent implements OnInit {
     });
   }
 
-  // Export functions
+  
   exportToExcel(): void {
     const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.filteredComplaints);
     const wb: XLSX.WorkBook = XLSX.utils.book_new();
@@ -228,16 +221,13 @@ export class AdminReportsComponent implements OnInit {
   const doc = new jsPDF('landscape');
   const title = 'Reporte de Denuncias';
 
-  // Título principal
   doc.setFontSize(18);
   doc.text(title, 14, 20);
 
-  // Fecha de generación
   doc.setFontSize(11);
   doc.setTextColor(100);
   doc.text(`Generado el: ${new Date().toLocaleString()}`, 14, 30);
 
-  // --- Capturar gráficos como imágenes ---
   const statusCanvas = document.querySelector('canvas[type="pie"], canvas[ng-reflect-type="pie"]') as HTMLCanvasElement;
   const trendCanvas = document.querySelector('canvas[type="line"], canvas[ng-reflect-type="line"]') as HTMLCanvasElement;
 
@@ -253,9 +243,8 @@ export class AdminReportsComponent implements OnInit {
     doc.addImage(trendImg, 'PNG', 120, yPosition, 150, 80);
   }
 
-  yPosition += 90; // espacio después de los gráficos
+  yPosition += 90; 
 
-  // --- Tabla de datos ---
   const headers = [
     'ID',
     'Tipo',
@@ -289,14 +278,13 @@ export class AdminReportsComponent implements OnInit {
     }
   });
 
-  // Guardar PDF
   doc.save(`reporte-denuncias-${new Date().toISOString().split('T')[0]}.pdf`);
 }
 
 resetFilters(): void {
   const endDate = new Date();
   const startDate = new Date();
-  startDate.setMonth(endDate.getMonth() - 1); // último mes por defecto
+  startDate.setMonth(endDate.getMonth() - 1); 
 
   this.filtersForm.patchValue({
     startDate: startDate.toISOString().split('T')[0],
@@ -305,7 +293,6 @@ resetFilters(): void {
     status: ''
   });
 
-  // Restaurar todas las denuncias
   this.filteredComplaints = [...this.complaints];
   this.currentPage = 1;
   this.updateCharts();
@@ -313,20 +300,16 @@ resetFilters(): void {
 private convertToCSV(items: any[]): string {
   if (items.length === 0) return '';
   
-  // Get headers from displayedColumns
   const headers = this.displayedColumns;
   
-  // Process data
   const rows = items.map(item => {
     return headers.map(header => {
       let value = item[header] || '';
       
-      // Format dates
       if ((header === 'createdAt' || header === 'updatedAt') && value) {
         value = new Date(value).toLocaleString();
       }
       
-      // Translate status and type
       if (header === 'status') return this.getStatusLabel(value);
       if (header === 'type') return this.getViolenceTypeLabel(value);
       
@@ -334,7 +317,6 @@ private convertToCSV(items: any[]): string {
     });
   });
   
-  // Combine headers and rows
   return [
     headers.join(','),
     ...rows.map(row => row.join(','))
@@ -352,12 +334,10 @@ formatDate(dateString: string): string {
     minute: '2-digit'
   });
 }
-  // Helper methods
 getStatusLabel(status: string): string {
   return STATUS_LABELS[status] || status;
 }
 private calculateResolutionTime(complaint: any): string {
-  // Validamos que existan ambas fechas
   if (!complaint.createdAt || !complaint.updatedAt) {
     return 'N/A';
   }
@@ -365,14 +345,12 @@ private calculateResolutionTime(complaint: any): string {
   const created = new Date(complaint.createdAt);
   const updated = new Date(complaint.updatedAt);
 
-  // Calculamos la diferencia en milisegundos
   const diffMs = updated.getTime() - created.getTime();
 
   if (diffMs < 0) {
-    return 'N/A'; // Evita errores si por alguna razón updatedAt < createdAt
+    return 'N/A'; 
   }
 
-  // Convertimos a días y horas
   const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
 

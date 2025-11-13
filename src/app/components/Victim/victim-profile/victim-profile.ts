@@ -1,16 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
-
-// Services
-import { AuthService } from '../../../services/auth.service';
 import { ComplaintService } from '../../../services/complaint.service';
 import { UserService } from '../../../services/user.service';
 import { UserProfile } from '../../../models/user.model';
-
-// Models
 import { Complaint, STATUS_LABELS, VIOLENCE_TYPE_LABELS, RELATIONSHIP_LABELS } from '../../../models/complaint.model';
 
 @Component({
@@ -59,8 +54,6 @@ private loadUserProfile(): void {
   this.isLoading = true;
   this.userService.getProfile().subscribe({
     next: (profile: any) => {
-      console.log('Respuesta del perfil:', profile);
-
       this.user = {
         fullName: profile.fullName || '',
         email: profile.email,
@@ -98,26 +91,19 @@ private loadUserProfile(): void {
 }
 
  toggleComplaintDetails(complaint: Complaint): void {
-  // Alternar el estado expandido
   complaint.isExpanded = !complaint.isExpanded;
 
-  // Si lo acaba de expandir, cargamos los detalles desde el backend
   if (complaint.isExpanded && complaint.id) {
     this.complaintService.getComplaintById(complaint.id).subscribe({
       next: (details) => {
-        // Mezclamos los datos existentes con los del backend (detallados)
         complaint.description = details.description;
         complaint.status = details.status;
         complaint.violenceType = details.violenceType;
         complaint.incidentDate = details.incidentDate;
         complaint.createdAt = details.createdAt;
         complaint.incidentLocation = details.incidentLocation;
-
-        // 👇 Si tu backend devuelve agresor o evidencias, las asignamos también
         complaint.aggressor = details.aggressor;
         complaint.evidences = details.evidences || [];
-
-        console.log('Detalles cargados para denuncia', complaint.id, details);
       },
       error: (error) => {
         console.error('Error al cargar detalles de la denuncia:', error);
@@ -153,7 +139,6 @@ onUpdatePhone(): void {
   this.error = null;
   this.success = null;
 
-  // Use the existing user's first and last name, or 'Desconocido' if they're not set
  const [firstName, ...rest] = (this.user.fullName || '').split(' ');
   const lastName = rest.join(' ') || 'Desconocido';
 
@@ -162,8 +147,6 @@ onUpdatePhone(): void {
     lastName,
     phone: this.phoneForm.value.phone
   };
-
-  console.log('Payload que se enviará:', updateData);
 
   this.userService.updateProfile(userId, updateData).subscribe({
     next: (updatedUser) => {
@@ -196,5 +179,4 @@ onUpdatePhone(): void {
   getRelationshipLabel(relation: string | undefined): string {
     return relation ? RELATIONSHIP_LABELS[relation] || relation : 'No especificado';
   }
-  //#endregion
 }

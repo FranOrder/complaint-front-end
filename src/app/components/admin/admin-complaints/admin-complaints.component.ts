@@ -3,19 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
-import { environment } from '../../../../environments/environment';
-
-// Models
 import { Complaint, STATUS_LABELS, VIOLENCE_TYPE_LABELS, RELATIONSHIP_LABELS } from '../../../models/complaint.model';
-
-// Services
-import { ComplaintService, ComplaintFilters } from '../../../services/complaint.service';
-
-// Components
+import { ComplaintService } from '../../../services/complaint.service';
 import { ToastComponent } from '../../../shared/components/toast/toast.component';
 import { TruncatePipe } from '../../../pipes/truncate.pipe';
 
-// Constants
 const ITEMS_PER_PAGE = 10;
 
 @Component({
@@ -34,7 +26,7 @@ const ITEMS_PER_PAGE = 10;
 export class AdminComplaintsComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   
-  // Component state
+  // Component
   complaints: Complaint[] = [];
   selectedComplaint: Complaint | null = null;
   isLoading = false;
@@ -43,7 +35,7 @@ export class AdminComplaintsComponent implements OnInit, OnDestroy {
   itemsPerPage: number = ITEMS_PER_PAGE;
   totalItems: number = 0;
   
-  // Filter state
+  // Filter
   searchTerm = '';
   violenceTypeFilter = '';
   violenceTypes = [
@@ -59,7 +51,7 @@ export class AdminComplaintsComponent implements OnInit, OnDestroy {
   ];
   selectedStatus: string = '';
   
-  // Toast state
+  // Toast
   showToast = false;
   toastMessage = '';
   toastType: 'success' | 'error' | 'warning' | 'info' = 'info';
@@ -79,34 +71,28 @@ export class AdminComplaintsComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
-  // Data loading
   
-loadComplaints(): void {
+  loadComplaints(): void {
   this.isLoading = true;
 
   this.complaintService.getAllComplaints()
     .pipe(takeUntil(this.destroy$))
     .subscribe({
       next: (complaints) => {
-        // Make a copy of all complaints initially
         let filteredComplaints = [...complaints];
 
-        // Apply status filter if selected
         if (this.selectedStatus) {
           filteredComplaints = filteredComplaints.filter(
             complaint => complaint.status === this.selectedStatus
           );
         }
 
-        // Apply violence type filter if selected
         if (this.violenceTypeFilter) {
           filteredComplaints = filteredComplaints.filter(
             complaint => complaint.violenceType === this.violenceTypeFilter
           );
         }
 
-        // Apply search term filter if it exists
         if (this.searchTerm) {
           const searchTermLower = this.searchTerm.toLowerCase();
 
@@ -125,10 +111,8 @@ loadComplaints(): void {
           });
         }
 
-        // 🔸 Actualizar total de elementos después de aplicar los filtros
         this.totalItems = filteredComplaints.length;
 
-        // 🔸 Aplicar paginación
         const startIndex = (this.currentPage - 1) * this.itemsPerPage;
         this.complaints = filteredComplaints.slice(
           startIndex,
@@ -144,32 +128,30 @@ loadComplaints(): void {
       }
     });
 }
-
   
-  // UI Actions
-  onPageChange(page: number): void {
+ onPageChange(page: number): void {
     this.currentPage = page;
     this.loadComplaints();
   }
   
-onFilterClick(): void {
-  this.currentPage = 1; // Reset to first page when filters change
+ onFilterClick(): void {
+  this.currentPage = 1; 
   this.loadComplaints();
 }
   
-  // Check if any filter is active
-  hasActiveFilters(): boolean {
+ hasActiveFilters(): boolean {
     return !!this.searchTerm || !!this.selectedStatus || !!this.violenceTypeFilter;
   }
 
-  clearFilters(): void {
+ clearFilters(): void {
     this.searchTerm = '';
     this.selectedStatus = '';
     this.violenceTypeFilter = '';
     this.currentPage = 1;
     this.loadComplaints();
   }
-toggleComplaintDetails(complaint: Complaint): void {
+
+  toggleComplaintDetails(complaint: Complaint): void {
   this.selectedComplaint = null;
 
   if (complaint.id) {
@@ -189,21 +171,20 @@ toggleComplaintDetails(complaint: Complaint): void {
   }
 }
 
-closeModal(): void {
+  closeModal(): void {
   this.selectedComplaint = null;
 }
-
   
-
   private updateComplaintInList(updatedComplaint: Complaint) {
   const index = this.complaints.findIndex(c => c.id === updatedComplaint.id);
   if (index !== -1) {
     const wasExpanded = this.complaints[index].isExpanded;
     this.complaints[index] = { ...updatedComplaint, isExpanded: wasExpanded };
   }
-  this.loadComplaints(); // Refresh the list to ensure data consistency
+  this.loadComplaints(); 
 }
-private handleStatusUpdateError(error: any, complaint: Complaint) {
+
+  private handleStatusUpdateError(error: any, complaint: Complaint) {
   console.error('Error updating status:', error);
   
   let errorMessage = 'Error al actualizar el estado';
@@ -216,47 +197,40 @@ private handleStatusUpdateError(error: any, complaint: Complaint) {
   this.showError(errorMessage);
   this.isLoading = false;
   
-  // Log the error for debugging
   if (error.error?.code) {
     console.warn('Error code from server:', error.error.code);
   }
 }
-  // Status management
-updateStatus(complaint: Complaint, newStatus: string): void {
+
+  updateStatus(complaint: Complaint, newStatus: string): void {
   if (!confirm(`¿Está seguro de cambiar el estado a "${this.statusLabels[newStatus] || newStatus}"?`)) {
     return;
   }
 
   this.isLoading = true;
   
-  // Show loading message
   this.showToast = true;
   this.toastType = 'info';
   this.toastMessage = 'Actualizando estado...';
 
-  // First, check if we need to go through an intermediate state
   const currentStatus = complaint.status;
   let targetStatus = newStatus;
 
-  // If trying to go from RECEIVED to ACTION_TAKEN, first go to IN_REVIEW
   if (currentStatus === 'RECEIVED' && newStatus === 'ACTION_TAKEN') {
     targetStatus = 'IN_REVIEW';
   }
 
-  const updateStatus = () => {
+const updateStatus = () => {
     this.complaintService.updateComplaintStatus(complaint.id!, targetStatus)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (updatedComplaint) => {
-          // If we just moved to IN_REVIEW and need to go to ACTION_TAKEN next
           if (updatedComplaint.status === 'IN_REVIEW' && newStatus === 'ACTION_TAKEN') {
-            // Update the local complaint status
             const index = this.complaints.findIndex(c => c.id === updatedComplaint.id);
             if (index !== -1) {
               this.complaints[index] = { ...updatedComplaint, isExpanded: this.complaints[index].isExpanded };
             }
             
-            // Now update to ACTION_TAKEN
             this.complaintService.updateComplaintStatus(complaint.id!, 'ACTION_TAKEN')
               .pipe(takeUntil(this.destroy$))
               .subscribe({
@@ -268,7 +242,6 @@ updateStatus(complaint: Complaint, newStatus: string): void {
                 error: (error) => this.handleStatusUpdateError(error, complaint)
               });
           } else {
-            // For all other cases (including direct transitions)
             this.updateComplaintInList(updatedComplaint);
             this.showSuccess('Estado actualizado correctamente');
             this.isLoading = false;
@@ -281,44 +254,34 @@ updateStatus(complaint: Complaint, newStatus: string): void {
   updateStatus();
 }
 
-  
-  // Helper to determine if a status button should be hidden based on current status
   shouldHideStatusButton(currentStatus: string, buttonStatus: string): boolean {
-    // Hide all buttons if status is CLOSED
     if (currentStatus === 'CLOSED') {
       return true;
     }
     
-    // Get the index of current status and button status in statusOptions
     const currentStatusIndex = this.statusOptions.findIndex(opt => opt.value === currentStatus);
     const buttonStatusIndex = this.statusOptions.findIndex(opt => opt.value === buttonStatus);
     
-    // If either status is not found, show the button
     if (currentStatusIndex === -1 || buttonStatusIndex === -1) {
       return false;
     }
     
-    // Hide the button if its status is the same as current status
     if (buttonStatus === currentStatus) {
       return true;
     }
     
-    // Hide the button if its status is before the current status in the workflow
     if (buttonStatusIndex < currentStatusIndex) {
       return true;
     }
     
-    // For other cases, show the button
     return false;
   }
-
-  // Helper to get violence type label
+  
   getViolenceTypeLabel(type: string): string {
     const found = this.violenceTypes.find(t => t.value === type);
     return found ? found.label : type || 'No especificado';
   }
 
-  // UI Helpers
   getStatusBadgeClass(status: string): string {
     switch (status) {
       case 'RECEIVED':
@@ -352,14 +315,11 @@ updateStatus(complaint: Complaint, newStatus: string): void {
     }
   }
 
-
-
   get endItemNumber(): number {
     if (!this.itemsPerPage || !this.totalItems) return 0;
     return Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
   }
 
- 
   get startItemNumber(): number {
     if (!this.itemsPerPage || !this.totalItems) return 0;
     return (this.currentPage - 1) * this.itemsPerPage + 1;
@@ -372,29 +332,24 @@ updateStatus(complaint: Complaint, newStatus: string): void {
     
     const totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
     const pages: number[] = [];
-    const maxPagesToShow = 5; // Maximum number of page buttons to show
+    const maxPagesToShow = 5; 
     
     let startPage = 1;
     let endPage = totalPages;
     
     if (totalPages > maxPagesToShow) {
-      // Calculate start and end pages to show
       const halfMaxPages = Math.floor(maxPagesToShow / 2);
       
       if (this.currentPage <= halfMaxPages) {
-        // Near the beginning
         endPage = maxPagesToShow;
       } else if (this.currentPage >= totalPages - halfMaxPages) {
-        // Near the end
         startPage = totalPages - maxPagesToShow + 1;
       } else {
-        // In the middle
         startPage = this.currentPage - halfMaxPages;
         endPage = this.currentPage + halfMaxPages;
       }
     }
     
-    // Generate the array of page numbers
     for (let i = startPage; i <= endPage; i++) {
       pages.push(i);
     }
@@ -418,7 +373,6 @@ updateStatus(complaint: Complaint, newStatus: string): void {
     this.showToast = false;
   }
   
-  // For template to track items in ngFor
   trackById(index: number, item: Complaint): number | undefined {
     return item.id;
   }

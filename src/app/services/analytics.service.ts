@@ -43,10 +43,8 @@ export class AnalyticsService {
     let errorMessage = 'Ocurrió un error en la petición';
     
     if (error.error instanceof ErrorEvent) {
-      // Error del lado del cliente
       errorMessage = `Error: ${error.error.message}`;
     } else {
-      // El backend devolvió un código de error
       errorMessage = `Código: ${error.status}, Mensaje: ${error.message}`;
     }
     
@@ -61,9 +59,7 @@ export class AnalyticsService {
     });
   }
 
-  // Get complaints by status
   getComplaintsByStatus(dateRange?: { start: Date, end: Date }): Observable<ComplaintStats> {
-    console.log('Obteniendo denuncias por estado...');
     
     let params: any = {};
     if (dateRange) {
@@ -81,9 +77,7 @@ export class AnalyticsService {
     );
   }
 
-  // Get complaints by type
   getComplaintsByType(): Observable<ComplaintStats> {
-    console.log('Obteniendo denuncias por tipo...');
     return this.http.get<ComplaintStats>(`${this.apiUrl}/complaints-by-type`, {
       headers: this.getAuthHeaders()
     }).pipe(
@@ -91,9 +85,7 @@ export class AnalyticsService {
     );
   }
 
-  // Get complaints by date range
   getComplaintsByDateRange(startDate: Date, endDate: Date): Observable<DateRangeStats> {
-    console.log('Obteniendo denuncias por rango de fechas...', { startDate, endDate });
     
     const params = {
       startDate: this.formatDate(startDate),
@@ -108,7 +100,6 @@ export class AnalyticsService {
     );
   }
 
-  // Get average resolution time
  getAverageResolutionTime(): Observable<number> {
   return this.http.get<AverageResolutionTimeResponse>(
     `${this.apiUrl}/average-resolution-time`,
@@ -117,17 +108,15 @@ export class AnalyticsService {
     map(response => response.averageResolutionTime),
     catchError(error => {
       console.error('Error getting average resolution time:', error);
-      return of(0); // Valor por defecto en caso de error
+      return of(0); 
     })
   );
 }
-  // Get dashboard summary
   getDashboardSummary() {
-    console.log('Obteniendo resumen del dashboard...');
     
     const endDate = new Date();
     const startDate = new Date();
-    startDate.setDate(endDate.getDate() - 30); // Last 30 days
+    startDate.setDate(endDate.getDate() - 30); 
 
     return forkJoin({
       byStatus: this.getComplaintsByStatus().pipe(
@@ -166,13 +155,10 @@ export class AnalyticsService {
     );
   }
 
-  // Helper to format date as YYYY-MM-DD
   private formatDate(date: Date): string {
     return date.toISOString().split('T')[0];
   }
 
-
-  // Calculate month-over-month growth
   calculateMonthlyGrowth(currentMonth: number, previousMonth: number): number {
     if (previousMonth === 0) return currentMonth > 0 ? 100 : 0;
     return Math.round(((currentMonth - previousMonth) / previousMonth) * 100);

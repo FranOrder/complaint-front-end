@@ -31,8 +31,7 @@ export interface CreateUserRequest {
   email: string;
   phone: string;
   password: string;
-  role: UserRole;
- 
+  role?: UserRole; // Optional with default 'ADMIN' in the service
 }
 
 export interface UserFilters {

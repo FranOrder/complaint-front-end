@@ -6,6 +6,7 @@ import { environment } from '../../../../environments/environment';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { SupportCenter, DISTRICT_ZONES, SupportCenterResponse } from '../../../models/support-center.model';
 
+
 @Component({
   selector: 'app-victim-map',
   standalone: true,
@@ -53,19 +54,13 @@ export class VictimMapComponent implements OnInit {
     
     this.http.get<SupportCenterResponse[]>(`${environment.apiUrl}/support-centers`).subscribe({
       next: (data) => {
-        console.log('Datos recibidos del backend:', JSON.stringify(data, null, 2));
         
-        // Mapear de SupportCenterResponse a SupportCenter
         this.supportCenters = data
           .filter(center => center.active === true || center.isActive === true)
-          .map(center => this.mapToSupportCenter(center));
-        
-        console.log('Centros activos mapeados:', JSON.stringify(this.supportCenters, null, 2));
-        
+          .map(center => this.mapToSupportCenter(center));                
         this.filteredCenters = [...this.supportCenters];
         this.updateFilters();
         
-        // Seleccionar el primer centro activo si está disponible
         if (this.filteredCenters.length > 0) {
           this.selectCenter(this.filteredCenters[0]);
         }
@@ -82,7 +77,6 @@ export class VictimMapComponent implements OnInit {
     });
   }
   updateFilters(): void {
-    // Actualizamos los distritos basados en la zona seleccionada
     if (this.selectedZone === 'Todas las zonas') {
       this.districts = [
         ...new Set(
@@ -99,7 +93,6 @@ export class VictimMapComponent implements OnInit {
       ].filter(Boolean) as string[];
     }
     
-    // Si el distrito seleccionado ya no está en la lista, lo limpiamos
     if (this.selectedDistrict && !this.districts.includes(this.selectedDistrict)) {
       this.selectedDistrict = '';
     }
@@ -116,7 +109,6 @@ export class VictimMapComponent implements OnInit {
       return matchesZone && matchesDistrict;
     });
     
-    // Actualizar el mapa con el primer centro filtrado si está disponible
     if (this.filteredCenters.length > 0 && !this.selectedCenter) {
       this.selectCenter(this.filteredCenters[0]);
     } else if (this.selectedCenter && !this.filteredCenters.some(c => c.id === this.selectedCenter?.id)) {
@@ -145,12 +137,10 @@ export class VictimMapComponent implements OnInit {
     
     const { street, district } = this.selectedCenter;
     
-    // Construir la dirección completa con calle y distrito
     const fullAddress = [street, district, 'Lima', 'Peru']
-      .filter(Boolean) // Elimina valores nulos o vacíos
+      .filter(Boolean) 
       .join(', ');
     
-    // Codificar la dirección para la URL
     const encodedAddress = encodeURIComponent(fullAddress);
     const mapUrl = `https://maps.google.com/maps?q=${encodedAddress}&output=embed`;
     this.mapUrl = this.sanitizer.bypassSecurityTrustResourceUrl(mapUrl);
@@ -162,7 +152,6 @@ export class VictimMapComponent implements OnInit {
     this.updateFilters();
   }
 
-  // Método para formatear el nombre del distrito reemplazando guiones bajos por espacios
   formatDistrictName(district: string): string {
     return district ? district.replace(/_/g, ' ') : '';
   }

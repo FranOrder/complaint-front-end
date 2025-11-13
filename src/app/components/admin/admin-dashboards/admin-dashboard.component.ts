@@ -41,12 +41,12 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   currentMonthCount = 0;
   previousMonthCount = 0;
 
-  // Estadísticas rápidas adicionales
+  // Estadísticas rápidas 
   averageResolutionTime = 0;
   resolvedPercentage = 0;
   mostCommonViolenceType = '';
 
-  // Datos para gráficos
+  // Datos gráficos
   pieChartType: ChartType = 'pie';
   barChartType: ChartType = 'bar';
   lineChartType: ChartType = 'line';
@@ -55,7 +55,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   barChartData: any;
   lineChartData: any;
 
-  // Opciones para los gráficos
+  // Opciones  gráficos
   chartOptions: any = {
     responsive: true,
     maintainAspectRatio: false,
@@ -69,7 +69,7 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     }
   };
 
-  // opciones específicas si las necesitas (mantener compatibilidad con templates previos)
+  // opciones espeiicas
   barChartOptions: any = {
     responsive: true,
     maintainAspectRatio: false,
@@ -118,9 +118,9 @@ constructor(
 
     const endDate = new Date();
     const startDate = new Date();
-    startDate.setDate(endDate.getDate() - 60); // Últimos 60 días (sirve para line chart y comparación mensual)
+    startDate.setDate(endDate.getDate() - 60); 
 
-    // ahora incluimos averageResolutionTime en el forkJoin
+   
     forkJoin({
       byStatus: this.analyticsService.getComplaintsByStatus(),
       byType: this.analyticsService.getComplaintsByType(),
@@ -135,19 +135,15 @@ constructor(
           this.prepareLineChart(data.byDateRange);
 
           // Estadísticas rápidas:
-          // totalComplaints ya se asigna en preparePieChart (suma de valores),
-          // pero si el backend retorna un total explícito en byStatus, podrías usarlo:
           if ((data.byStatus as any)?.total) {
             this.totalComplaints = (data.byStatus as any).total;
           }
-          // average resolution time
           this.averageResolutionTime = data.averageResolutionTime || 0;
 
-          // resolved percentage (usamos la data de byStatus)
           const closedCount = data.byStatus?.data?.['CLOSED'] || 0;
           this.resolvedPercentage = this.totalComplaints > 0 ? Math.round((closedCount / this.totalComplaints) * 100) : 0;
 
-          // most common violence type from byType
+          
           this.mostCommonViolenceType = 'N/A';
           if (data.byType?.data) {
             let max = -1;
@@ -158,11 +154,9 @@ constructor(
                 mostCommonType = type;
               }
             }
-            // Use the Spanish label if available, otherwise use the original type
             this.mostCommonViolenceType = VIOLENCE_TYPE_LABELS[mostCommonType] || mostCommonType;
           }
 
-          // cálculo de comparación mensual (también setea currentMonthCount y previousMonthCount)
           this.calculateMonthlyComparison(data.byDateRange);
         } catch (e) {
           console.error('Error procesando datos del dashboard:', e);
@@ -179,7 +173,7 @@ constructor(
     });
   }
 
-  /** Pie Chart - Distribución de denuncias por estado */
+  /** Pie Chart  */
   private preparePieChart(statusData: ComplaintStats): void {
     if (!statusData?.data) {
       this.pieChartData = { labels: [], datasets: [] };
@@ -187,7 +181,6 @@ constructor(
       return;
     }
     
-    // Map the status keys to their Spanish labels
     const statusEntries = Object.entries(statusData.data);
     const labels = statusEntries.map(([key]) => STATUS_LABELS[key] || key);
     const values = statusEntries.map(([_, value]) => Number(value));
@@ -205,14 +198,14 @@ constructor(
     };
   }
 
-  /** Bar Chart - Denuncias por tipo de violencia */
+  /** Bar Chart */
   private prepareBarChart(typeData: ComplaintStats): void {
     if (!typeData?.data) {
       this.barChartData = { labels: [], datasets: [] };
       return;
     }
     
-    // Map the violence type keys to their Spanish labels
+  
     const typeEntries = Object.entries(typeData.data);
     const labels = typeEntries.map(([key]) => VIOLENCE_TYPE_LABELS[key] || key);
     const values = typeEntries.map(([_, value]) => Number(value));
@@ -229,7 +222,7 @@ constructor(
     };
   }
 
-  /** Line Chart - Tendencia de denuncias últimos días */
+  /** Line Chart */
   private prepareLineChart(dateRangeData: any): void {
     if (!dateRangeData?.data) {
       this.lineChartData = { labels: [], datasets: [] };
@@ -255,7 +248,7 @@ constructor(
 
   /** Cálculo del crecimiento mensual actual vs anterior */
   private calculateMonthlyComparison(dateRangeData: any): void {
-    // Resetea conteos
+
     this.currentMonthCount = 0;
     this.previousMonthCount = 0;
     if (!dateRangeData?.data) {
@@ -268,25 +261,21 @@ constructor(
     const previousMonth = (currentMonth === 0) ? 11 : currentMonth - 1;
     const currentYear = now.getFullYear();
 
-    // Si los datos abarcan meses previos en años distintos, debemos comparar por año+mes
+    
     for (const [dateStr, count] of Object.entries(dateRangeData.data)) {
       const d = new Date(dateStr);
       if (d.getMonth() === currentMonth && d.getFullYear() === currentYear) {
         this.currentMonthCount += count as number;
       }
-      // previousMonth puede estar en el mismo año o en año anterior si currentMonth === 0
+      
       if (d.getMonth() === previousMonth && (currentMonth > 0 ? d.getFullYear() === currentYear : d.getFullYear() === currentYear - 1)) {
         this.previousMonthCount += count as number;
       }
     }
 
     this.monthlyGrowth = this.analyticsService.calculateMonthlyGrowth(this.currentMonthCount, this.previousMonthCount);
-    // deja logs para debugging
-    console.log('Comparación mensual:', {
-      currentMonthCount: this.currentMonthCount,
-      previousMonthCount: this.previousMonthCount,
-      monthlyGrowth: this.monthlyGrowth
-    });
+    
+    
   }
 
   showDashboard(): boolean {
