@@ -13,6 +13,9 @@ export interface UserResponse {
   lastName: string;
   email: string;
   phone: string;
+  role: UserRole;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface UpdateProfileRequest {

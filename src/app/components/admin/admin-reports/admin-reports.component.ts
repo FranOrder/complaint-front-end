@@ -292,6 +292,7 @@ export class AdminReportsComponent implements OnInit {
   // Guardar PDF
   doc.save(`reporte-denuncias-${new Date().toISOString().split('T')[0]}.pdf`);
 }
+
 resetFilters(): void {
   const endDate = new Date();
   const startDate = new Date();

@@ -7,8 +7,7 @@ import {
   UpdateProfileRequest, 
   UserResponse, 
   CreateUserRequest, 
-  UserRole,
-  UserFilters
+ 
 } from '../models/user.model';
 
 @Injectable({ providedIn: 'root' })
@@ -54,12 +53,13 @@ export class UserService {
 
 
   // Admin user management methods
-   getAllUsers(): Observable<UserResponse[]> {
-    return this.http.get<UserResponse[]>(`${this.apiUrl}`, {
-      headers: this.getAuthHeaders()
-    });
+getAllUsers(role?: string): Observable<UserResponse[]> {
+  let params = new HttpParams();
+  if (role) {
+    params = params.set('role', role);
   }
-
+  return this.http.get<UserResponse[]>(`${this.apiUrl}`, { params });
+}
 
  createUser(userData: CreateUserRequest): Observable<UserResponse> {
     return this.http.post<UserResponse>(`${this.apiUrl}/admin`, userData, {
@@ -80,6 +80,7 @@ export class UserService {
       headers: this.getAuthHeaders()
     });
   }
+
 
 
   private getAuthHeaders(isFormData: boolean = false): HttpHeaders {
