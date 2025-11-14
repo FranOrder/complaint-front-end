@@ -44,7 +44,6 @@ export class VictimHomeComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    // Any view initialization can go here
   }
 
   showDashboard(): boolean {

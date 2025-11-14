@@ -19,7 +19,6 @@ export class AuthService {
     this.currentUserSubject = new BehaviorSubject<UserInfo | null>(this.getUserInfo());
     this.currentUser$ = this.currentUserSubject.asObservable();
     
-    // Check if token exists in localStorage when service initializes
     if (this.getToken()) {
       this.isAuthenticatedSubject.next(true);
     }
@@ -56,7 +55,6 @@ export class AuthService {
   }
 
   register(userData: RegisterRequest): Observable<AuthResponse> {
-    // Set default role if not provided
     if (!userData.role) {
       userData.role = 'USER';
     }
@@ -65,15 +63,12 @@ export class AuthService {
   }
 
   logout(): void {
-    // Remove the token from localStorage
     localStorage.removeItem('auth_token');
     
-    // Clear auth data and update observables
     this.clearAuthData();
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
     
-    // Navigate to login page
     this.router.navigate(['/login']);
   }
 
@@ -81,19 +76,16 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  // Alias for isLoggedIn for better readability
   isAuthenticated(): boolean {
     return this.isLoggedIn();
   }
 
   getToken(): string | null {
-    // First check localStorage for the token
     const token = localStorage.getItem('auth_token');
     if (token) {
       return token;
     }
     
-    // Fallback to the old token storage for backward compatibility
     return localStorage.getItem('token');
   }
 

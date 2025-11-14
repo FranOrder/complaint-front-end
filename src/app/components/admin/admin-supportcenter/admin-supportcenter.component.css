@@ -1,12 +1,4 @@
-:root {
-  --primary-color: #b497bd;
-  --secondary-color: #e6daf5;
-  --accent-color: #8367bf;
-  --background-soft: #f8f5fc;
-  --text-dark: #2c2c2c;
-}
 
-/* Estilos generales */
 .card {
   border: none;
   box-shadow: 0 4px 8px #8367bf5b;

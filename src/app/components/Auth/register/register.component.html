@@ -14,13 +14,11 @@
         <p class="text-muted px-3">Completa el formulario para registrarte.</p>
       </div>
 
-      <!-- Mensaje de éxito -->
       <div *ngIf="success" class="alert alert-success" role="alert">
         ¡Registro exitoso! Redirigiendo...
       </div>
 
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-        <!-- Mensaje de error -->
         <div *ngIf="error" class="alert alert-danger" role="alert">
           {{ error }}
         </div>

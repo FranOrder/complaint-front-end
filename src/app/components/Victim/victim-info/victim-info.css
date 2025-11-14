@@ -26,7 +26,6 @@
     margin-bottom: 20px;
 }
 
-/* 🔘 Botones del menú principal */
 .btn {
     background-color: #faf7ff;
     border: 2px solid #b497bd;
@@ -36,10 +35,10 @@
     font-weight: 500;
     font-size: 16px;
     transition: all 0.3s ease;
-    flex: 1 1 200px; /* 🔹 Esto hace que todos los botones tengan el mismo ancho base */
-    min-width: 200px; /* 🔹 Ancho mínimo uniforme */
-    max-width: 220px; /* 🔹 Evita que crezcan demasiado */
-    height: 60px; /* 🔹 Altura uniforme */
+    flex: 1 1 200px;
+    min-width: 200px;
+    max-width: 220px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -52,18 +51,15 @@
     transform: scale(1.05);
 }
 
-/* 🔹 Alineación del contenedor de botones */
 .d-flex.flex-wrap.justify-content-center.mb-4 {
     gap: 15px;
 }
 .accordion-button { background-color: #e6daf5; }
-/* 🔸 Estilo del scrollspy del modal */
 .modal-header-custom {
     background-color: #b497bd;
     color: white;
 }
 
-/* 🔸 Navegación dentro del modal */
 .nav-link {
     background-color: #ceebf5f2;
     padding: 15px 20px;

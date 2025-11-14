@@ -129,12 +129,10 @@ constructor(
     }).subscribe({
       next: (data) => {
         try {
-          // Preparar gráficos
           this.preparePieChart(data.byStatus);
           this.prepareBarChart(data.byType);
           this.prepareLineChart(data.byDateRange);
-
-          // Estadísticas rápidas:
+        
           if ((data.byStatus as any)?.total) {
             this.totalComplaints = (data.byStatus as any).total;
           }
@@ -246,7 +244,7 @@ constructor(
     };
   }
 
-  /** Cálculo del crecimiento mensual actual vs anterior */
+  /** Cálculo */
   private calculateMonthlyComparison(dateRangeData: any): void {
 
     this.currentMonthCount = 0;

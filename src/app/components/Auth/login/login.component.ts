@@ -35,7 +35,6 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // Helper method to check for form control errors
   hasError(controlName: string, errorType: string): boolean {
     const control = this.loginForm.get(controlName);
     return control ? control.hasError(errorType) && (control.dirty || control.touched) : false;
@@ -71,7 +70,6 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // Navigate to register page
  navigateToRegister(): void {
   this.router.navigate(['/auth/register']);
 }

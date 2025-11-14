@@ -1,15 +1,8 @@
-:root {
-    --primary-color: #b497bd;
-    --secondary-color: #e6daf5;
-    --sidebar-primary: #8367bf;
-    --sidebar: #ceebf5f2;
-    --white: #faf7ff;
-}/* General Styles */
+
 .victim-map-container {
   min-height: calc(100vh - 200px);
 }
 
-/* Card Styles */
 .card {
   border: none;
   box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
@@ -26,7 +19,6 @@
   font-weight: 600;
 }
 
-/* List Group Styles */
 .list-group-item {
   border-left: none;
   border-right: none;
@@ -55,7 +47,6 @@
   
 }
 
-/* Map Container */
 .map-container {
   border-radius: 0.25rem;
   overflow: hidden;
@@ -91,7 +82,6 @@
 
 }
 
-/* Responsive Adjustments */
 @media (max-width: 768px) {
   .card {
     margin-bottom: 1rem;
@@ -102,7 +92,6 @@
   }
 }
 
-/* Scrollbar Styles */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -122,30 +111,24 @@
   background: #a8a8a8;
 }
 
-/* Custom Badge Styles */
 .badge {
   font-weight: 500;
   padding: 0.4em 0.8em;
 }
-
-/* Form Control Styles */
 .form-select:focus, 
 .form-control:focus {
   border-color: #86b7fe;
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
 }
 
-/* Icon Styles */
 .bi {
   margin-right: 0.25rem;
 }
 
-/* Active State for List Items */
 .list-group-item.active .text-muted {
   color: rgba(255, 255, 255, 0.8) !important;
 }
 
-/* Link Styles */
 a {
   color: #0d6efd;
   text-decoration: none;

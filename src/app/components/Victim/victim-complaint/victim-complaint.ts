@@ -213,13 +213,9 @@ export class VictimComplaintComponent implements OnInit {
   aggressorRelationship: this.complaintForm.value.aggressorRelationship,
   aggressorAdditionalDetails: this.complaintForm.value.aggressorAdditionalDetails
 };
-    
-    console.log('Submitting complaint data:', complaintData);
 
     try {
       const response: any = await this.complaintService.createComplaint(complaintData).toPromise();
-      
-      console.log('Denuncia creada exitosamente', response);
       
       if (this.selectedFiles.length > 0) {
         const complaintId = response.body?.id || response.id;
@@ -227,13 +223,11 @@ export class VictimComplaintComponent implements OnInit {
           throw new Error('No se pudo obtener el ID de la denuncia');
         }
         
-        console.log('Uploading', this.selectedFiles.length, 'files...');
-        
         for (const file of this.selectedFiles) {
           try {
-            console.log('Uploading file:', file.name);
+           
             await this.complaintService.uploadFile(complaintId, file).toPromise();
-            console.log('File uploaded successfully:', file.name);
+           
           } catch (error) {
             console.error('Error uploading file:', file.name, error);
           }

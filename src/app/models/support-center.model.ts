@@ -6,7 +6,7 @@ export interface SupportCenter {
   phone: string;
   email: string;
   schedule: string;
-  isActive: boolean;  // Standardized to isActive
+  isActive: boolean;  
   createdBy?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -19,11 +19,8 @@ export interface SupportCenterResponse {
   phone: string;
   email: string;
   schedule: string;
-
-  // 🔹 Acepta ambos nombres posibles (para compatibilidad)
   active?: boolean;
   isActive?: boolean;
-
   createdBy?: string;
   createdAt: string;
   updatedAt: string;

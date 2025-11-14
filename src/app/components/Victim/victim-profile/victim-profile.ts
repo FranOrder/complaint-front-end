@@ -163,9 +163,6 @@ onUpdatePhone(): void {
   });
 }
 
-
-
-
   get phone() { return this.phoneForm.get('phone'); }
 
   getStatusLabel(status: string | undefined): string {

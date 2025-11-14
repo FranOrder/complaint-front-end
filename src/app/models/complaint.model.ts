@@ -30,8 +30,6 @@ export interface Complaint {
   isExpanded?: boolean;
   aggressor?: Aggressor;
   evidences?: Evidence[];
-  
-  // Propiedades para la vista
   victimName?: string;
   victimEmail?: string;
   victimPhone?: string;

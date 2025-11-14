@@ -91,7 +91,7 @@ export class ToastComponent implements OnChanges {
   @Input() type: 'success' | 'error' | 'warning' | 'info' = 'info';
   @Input() show: boolean = false;
   @Input() autoClose: boolean = true;
-  @Input() autoCloseDelay: number = 5000; // 5 segundos por defecto
+  @Input() autoCloseDelay: number = 5000;
   
   @Output() closed = new EventEmitter<void>();
   

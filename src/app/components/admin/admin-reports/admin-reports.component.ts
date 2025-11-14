@@ -1,4 +1,3 @@
-// admin-reports.component.ts
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule,FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
@@ -138,7 +137,7 @@ export class AdminReportsComponent implements OnInit {
     return true;
   });
 
-  this.currentPage = 1; // Reinicia a la primera página
+  this.currentPage = 1; 
   this.updateCharts();
   this.isLoading = false;
 }

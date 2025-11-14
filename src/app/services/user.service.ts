@@ -48,7 +48,6 @@ export class UserService {
 
 
   createAdmin(adminData: Omit<CreateUserRequest, 'role'>): Observable<UserResponse> {
-    // Set role to ADMIN by default
     const adminRequest: CreateUserRequest = {
       ...adminData,
       role: 'ADMIN'
@@ -74,7 +73,6 @@ export class UserService {
 }
 
 
-  // Admin user management methods
 getAllUsers(role?: string): Observable<UserResponse[]> {
   let params = new HttpParams();
   if (role) {
@@ -82,9 +80,6 @@ getAllUsers(role?: string): Observable<UserResponse[]> {
   }
   return this.http.get<UserResponse[]>(`${this.apiUrl}`, { params });
 }
-
-
-
 
   private getAuthHeaders(isFormData: boolean = false): HttpHeaders {
     const token = localStorage.getItem('token') || '';

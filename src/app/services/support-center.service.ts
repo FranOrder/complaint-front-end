@@ -21,7 +21,6 @@ export class SupportCenterService {
     };
   }
 
-  /** 🔹 GET ALL */
   getAllSupportCenters(): Observable<SupportCenter[]> {
     return this.http.get<SupportCenterResponse[]>(this.apiUrl, { headers: this.headers }).pipe(
       map((centers: SupportCenterResponse[]) =>
@@ -30,31 +29,25 @@ export class SupportCenterService {
     );
   }
 
-  /** 🔹 GET BY ID */
   getSupportCenterById(id: number): Observable<SupportCenter> {
     return this.http.get<SupportCenterResponse>(`${this.apiUrl}/${id}`, { headers: this.headers }).pipe(
       map(center => this.mapFromResponse(center))
     );
   }
 
-  /** 🔹 CREATE */
   createSupportCenter(supportCenter: Partial<SupportCenter>): Observable<SupportCenterResponse> {
     const payload = this.mapToRequest(supportCenter);
     return this.http.post<SupportCenterResponse>(`${this.apiUrl}/create`, payload, { headers: this.headers });
   }
 
-  /** 🔹 UPDATE */
   updateSupportCenter(id: number, supportCenter: Partial<SupportCenter>): Observable<SupportCenterResponse> {
     const payload = this.mapToRequest(supportCenter);
     return this.http.put<SupportCenterResponse>(`${this.apiUrl}/${id}/edit`, payload, { headers: this.headers });
   }
-
-  /** 🔹 DELETE */
   deleteSupportCenter(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}/delete`, { headers: this.headers });
   }
 
-  /** 🧩 Mapear del backend → frontend */
   private mapFromResponse(center: SupportCenterResponse): SupportCenter {
     return {
       id: center.id,
@@ -64,18 +57,17 @@ export class SupportCenterService {
       phone: center.phone,
       email: center.email,
       schedule: center.schedule,
-      isActive: center.active ?? center.isActive ?? true, // 👈 Detecta ambos
+      isActive: center.active ?? center.isActive ?? true, 
       createdAt: center.createdAt,
       updatedAt: center.updatedAt,
       createdBy: center.createdBy
     };
   }
 
-  /** 🧩 Mapear del frontend → backend */
   private mapToRequest(center: Partial<SupportCenter>): any {
     return {
       ...center,
-      active: center.isActive ?? true // 👈 Lo transforma al formato del back
+      active: center.isActive ?? true
     };
   }
 }

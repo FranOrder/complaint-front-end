@@ -3,7 +3,7 @@ import { CommonModule,  } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { environment } from '../../../../environments/environment';
+
 
 @Component({
   selector: 'app-register',
@@ -17,7 +17,6 @@ export class RegisterComponent implements OnInit {
   loading = false;
   success = false;
   error: string | null = null;
-  // Usando ruta relativa desde la raíz de assets
   logoPath = 'assets/images/logoo.png';
   showLogo = true;
 
@@ -52,13 +51,12 @@ export class RegisterComponent implements OnInit {
         Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/)
       ]],
       confirmPassword: ['', Validators.required],
-      role: ['VICTIM'] // Default role
+      role: ['VICTIM'] 
     }, { validators: this.passwordMatchValidator });
   }
 
   ngOnInit(): void {}
 
-  // Getter for easy access to form fields
   get firstName() { return this.registerForm.get('firstName'); }
   get lastName() { return this.registerForm.get('lastName'); }
   get email() { return this.registerForm.get('email'); }
@@ -66,14 +64,12 @@ export class RegisterComponent implements OnInit {
   get password() { return this.registerForm.get('password'); }
   get confirmPassword() { return this.registerForm.get('confirmPassword'); }
 
-  // Handle image loading errors
   onImageError(event: Event) {
     console.error('Error loading image:', (event.target as HTMLImageElement).src);
     this.showLogo = false;
   }
   
 
-  // Custom validator to check if passwords match
   passwordMatchValidator(form: FormGroup) {
   const password = form.get('password')?.value;
   const confirmPassword = form.get('confirmPassword')?.value;
@@ -104,7 +100,6 @@ export class RegisterComponent implements OnInit {
     this.authService.register(userData).subscribe({
       next: () => {
         this.success = true;
-        // Redirect to login after 2 seconds
         setTimeout(() => {
           this.router.navigate(['/login']);
         }, 2000);

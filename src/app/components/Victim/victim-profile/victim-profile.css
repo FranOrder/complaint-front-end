@@ -6,14 +6,12 @@
     --white: #faf7ff;
 }
 
-/* Profile container */
 .profile-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
 }
 
-/* Card styles */
 .card {
   border: none;
   border-radius: 10px;
@@ -22,13 +20,10 @@
   margin-bottom: 20px;
 }
 
-/* Estilos base del header */
 .card-header-complaint {
   border-left: 5px solid transparent;
   padding: 10px 15px;
 }
-
-/* Estados */
 .status-RECEIVED {
   background-color: rgba(98, 177, 252, 0.966);
   border-left-color: #0179e9ea;
@@ -82,7 +77,6 @@
   padding: 15px 20px;
 }
 
-/* Profile header */
 .profile-header {
   text-align: center;
   padding: 20px 0;
@@ -106,7 +100,6 @@
 
 
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
   .profile-avatar {
     width: 100px;
