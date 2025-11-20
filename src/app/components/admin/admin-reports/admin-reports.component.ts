@@ -202,20 +202,6 @@ export class AdminReportsComponent implements OnInit {
     });
   }
 
-  
-  exportToExcel(): void {
-    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.filteredComplaints);
-    const wb: XLSX.WorkBook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
-    XLSX.writeFile(wb, `reporte-${new Date().toISOString().split('T')[0]}.xlsx`);
-  }
-
-  exportToCSV(): void {
-    const csv = this.convertToCSV(this.filteredComplaints);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    saveAs(blob, `reporte-${new Date().toISOString().split('T')[0]}.csv`);
-  }
-
  exportToPDF(): void {
   const doc = new jsPDF('landscape');
   const title = 'Reporte de Denuncias';
@@ -295,31 +281,6 @@ resetFilters(): void {
   this.filteredComplaints = [...this.complaints];
   this.currentPage = 1;
   this.updateCharts();
-}
-private convertToCSV(items: any[]): string {
-  if (items.length === 0) return '';
-  
-  const headers = this.displayedColumns;
-  
-  const rows = items.map(item => {
-    return headers.map(header => {
-      let value = item[header] || '';
-      
-      if ((header === 'createdAt' || header === 'updatedAt') && value) {
-        value = new Date(value).toLocaleString();
-      }
-      
-      if (header === 'status') return this.getStatusLabel(value);
-      if (header === 'type') return this.getViolenceTypeLabel(value);
-      
-      return JSON.stringify(value);
-    });
-  });
-  
-  return [
-    headers.join(','),
-    ...rows.map(row => row.join(','))
-  ].join('\r\n');
 }
 
 formatDate(dateString: string): string {
